@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os.path as osp
+import shutil
 from collections import Counter
 import itertools
-import six
+from tempfile import mkdtemp
+import json
 import pytest
 
 from wordpool import WordList, WordPool
@@ -14,13 +16,14 @@ def wordpool_en():
     yield osp.join("wordpool", "data", "ram_wordpool_en.txt")
 
 
-class TestWordList:
-    # def test_from_file(self):
-    #     words = WordList(osp.join(data_path(), "lures_EN.txt"))
-    #     assert len(words) is 65
-    #     for word in words:
-    #         assert isinstance(word, six.text_type)
+@pytest.fixture
+def tempdir():
+    directory = mkdtemp()
+    yield directory
+    shutil.rmtree(directory, ignore_errors=True)
 
+
+class TestWordList:
     def test_shuffle(self):
         num = 10
         words = WordList([str(n) for n in range(num)])
@@ -29,6 +32,39 @@ class TestWordList:
         assert len(res) is num
         for n in range(num):
             assert str(n) in res
+
+    def test_to_dict(self):
+        words = ["abc", "def"]
+        meta = {"thing": 1}
+        d = WordList(words, meta).to_dict()
+        assert "metadata" in d
+        assert "thing" in d["metadata"]
+        assert "created" in d["metadata"]
+        assert "words" in d
+        assert d["words"] == words
+
+    def test_save(self, wordpool_en, tempdir):
+        words = WordList(wordpool_en)
+
+        for suffix in [".lst", ".txt"]:
+            filename = osp.join(tempdir, "out" + suffix)
+            words.save(filename)
+            with open(filename) as f:
+                saved = f.read().split()
+                assert WordList(saved) == words
+
+        filename = osp.join(tempdir, "out.json")
+        words.save(filename)
+        with open(filename) as f:
+            saved = json.load(f)
+            assert "words" in saved
+            assert saved["words"] == words
+            assert "metadata" in saved
+            assert saved["metadata"] == words.metadata
+
+        with pytest.raises(IOError):
+            filename = osp.join(tempdir, "out.wrong")
+            words.save(filename)
 
 
 class TestWordPool:
