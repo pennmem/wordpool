@@ -75,18 +75,19 @@ class WordPool(object):
     """Handles operations for entire word pools. Here, a word pool is
     considered to be made up of a series one or more word lists.
 
-    :param str path: Path to word pool.
-    :param int num_lists: The number of lists to generate out of the entire
-        pool.
+    .. note:: Word lists must contain the same number of words!
+
+    :param list lists: Word lists to include (coerced to :class:`WordList` if
+       not already).
+    :raises: AssertionError when lists are not all the same length.
 
     """
-    def __init__(self, path, num_lists=1):
-        assert num_lists >= 1 and isinstance(num_lists, int)
-        words = WordList(path).shuffle()
-        assert len(words) % num_lists == 0
-        step = int(len(words) / num_lists)
-        self.lists = [WordList(words[step*n:(step*n + step)]) for n in range(num_lists)]
-        assert all([len(l) == step for l in self.lists])
+    def __init__(self, lists):
+        self.lists = [WordList(list_) if not isinstance(list_, WordList) else list_
+                      for list_ in lists]
+        length = len(self.lists[0])
+        for list_ in self.lists:
+            assert length == len(list_)
 
     def __str__(self):
         return str(self.lists)
@@ -100,6 +101,15 @@ class WordPool(object):
 
     def __getitem__(self, item):
         return self.lists[item]
+
+    def shuffle_lists(self):
+        """Shuffle within lists in the pool (i.e., shuffle each list but do not
+        move any words between lists. Returns self.
+
+        """
+        for list_ in self.lists:
+            list_.shuffle()
+        return self
 
     def to_dict(self):
         """Converts the word pool to a dict representation. Format::
