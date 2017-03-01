@@ -19,6 +19,6 @@ def plaintext_to_json(txt_path, json_path=None, encoding="utf-8", indent=2):
 
     if json_path is not None:
         with open(json_path, "w") as jfile:
-            jfile.write(json.dumps(words, indent=2))
+            jfile.write(json.dumps(words, indent=indent))
 
     return words

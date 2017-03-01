@@ -11,7 +11,7 @@ from wordpool import WordList, WordPool
 
 @pytest.fixture
 def wordpool_en():
-    yield osp.join(data_path(), "wordpool_en.txt")
+    yield osp.join("wordpool", "data", "ram_wordpool_en.txt")
 
 
 class TestWordList:
@@ -28,7 +28,7 @@ class TestWordList:
         assert res is words
         assert len(res) is num
         for n in range(num):
-            assert n in res
+            assert str(n) in res
 
 
 class TestWordPool:

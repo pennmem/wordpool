@@ -38,7 +38,7 @@ class WordPool(object):
     def __init__(self, path, num_lists=25):
         words = WordList(path).shuffle()
         assert len(words) % num_lists == 0
-        step = len(words) / num_lists
+        step = int(len(words) / num_lists)
         self.lists = [WordList(words[step*n:(step*n + step)]) for n in range(num_lists)]
         assert all([len(l) == step for l in self.lists])
 

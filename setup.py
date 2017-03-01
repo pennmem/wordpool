@@ -8,5 +8,12 @@ setup(
     packages=["wordpool"],
     package_data={
         "": ["*.txt", "*.json"]
-    }
+    },
+    install_requires=[
+        "six"
+    ],
+    tests_require=[
+        "pytest",
+        "pytest-cov"
+    ]
 )
