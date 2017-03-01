@@ -76,5 +76,11 @@ class TestWordPool:
         pool = WordPool(wordpool_en)
         assert len(pool) == len(pool.lists)
 
+    def test_iter(self, wordpool_en):
+        for words in WordPool(wordpool_en):
+            assert len(words) == 12
+            for word in words:
+                assert type(word) is str
+
     def test_save(self):
         pass

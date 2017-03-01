@@ -48,6 +48,10 @@ class WordPool(object):
     def __len__(self):
         return len(self.lists)
 
+    def __iter__(self):
+        for word_list in self.lists:
+            yield word_list
+
     def __getitem__(self, item):
         return self.lists[item]
 
