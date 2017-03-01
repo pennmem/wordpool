@@ -43,18 +43,10 @@ class TestWordList:
         assert "words" in d
         assert d["words"] == words
 
-    def test_save(self, wordpool_en, tempdir):
+    def test_to_json(self, wordpool_en, tempdir):
         words = WordList(wordpool_en)
-
-        for suffix in [".lst", ".txt"]:
-            filename = osp.join(tempdir, "out" + suffix)
-            words.save(filename)
-            with open(filename) as f:
-                saved = f.read().split()
-                assert WordList(saved) == words
-
         filename = osp.join(tempdir, "out.json")
-        words.save(filename)
+        words.to_json(filename)
         with open(filename) as f:
             saved = json.load(f)
             assert "words" in saved
@@ -62,9 +54,13 @@ class TestWordList:
             assert "metadata" in saved
             assert saved["metadata"] == words.metadata
 
-        with pytest.raises(IOError):
-            filename = osp.join(tempdir, "out.wrong")
-            words.save(filename)
+    def test_to_text(self, wordpool_en, tempdir):
+        words = WordList(wordpool_en)
+        filename = osp.join(tempdir, "out.txt")
+        words.to_text(filename)
+        with open(filename) as f:
+            saved = f.read().split()
+            assert WordList(saved) == words
 
 
 class TestWordPool:

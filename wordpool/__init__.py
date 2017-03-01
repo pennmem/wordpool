@@ -49,30 +49,31 @@ class WordList(list):
             "words": [word for word in self]
         }
 
-    def save(self, filename, **json_kwargs):
-        """Save the list to a plaintext or JSON file. If saving as JSON, the
-        resulting file will be of the form produced by
-        :meth:`WordList.to_dict`. Saving to plaintext will just save the words.
+    def to_json(self, filename, indent=2):
+        """Save the list to a JSON file with form the same as with
+        :meth:`WordList.to_dict`.
 
-        :param str filename: Output filename. File type will be determined by
-            the suffix (``.txt`` or ``.lst`` for plaintext, ``.json`` for JSON).
-        :param dict json_kwargs: Keyword arguments to pass to
-            :func:`json.dumps` if saving as JSON.
-        :raises: IOError when an invalid file suffix is used.
+        :param str filename:
+        :param int indent: Spaces to indent resulting file with.
 
         """
         with open(filename, "w") as outfile:
-            if filename.endswith(".json"):
-                text = json.dumps(self.to_dict(), **json_kwargs)
-            elif filename.endswith(".lst") or filename.endswith(".txt"):
-                text = "\n".join(self)
-            else:
-                raise IOError("Invalid file type. Must be '.lst', '.txt', or '.json'")
-            outfile.write(text)
+            json.dump(self.to_dict(), outfile, indent=indent)
+
+    def to_text(self, filename, delimiter="\n"):
+        """Save the list of words only to a plaintext file.
+
+        :param str filename:
+        :param str delimiter:
+
+        """
+        with open(filename, "w") as outfile:
+            outfile.write(delimiter.join(self))
 
 
 class WordPool(object):
-    """Handles operations for entire word pools.
+    """Handles operations for entire word pools. Here, a word pool is
+    considered to be made up of a series one or more word lists.
 
     :param str path: Path to word pool.
     :param int num_lists: The number of lists to generate out of the entire
@@ -80,6 +81,7 @@ class WordPool(object):
 
     """
     def __init__(self, path, num_lists=1):
+        assert num_lists >= 1 and isinstance(num_lists, int)
         words = WordList(path).shuffle()
         assert len(words) % num_lists == 0
         step = int(len(words) / num_lists)
