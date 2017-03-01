@@ -79,7 +79,7 @@ class WordPool(object):
         pool.
 
     """
-    def __init__(self, path, num_lists=25):
+    def __init__(self, path, num_lists=1):
         words = WordList(path).shuffle()
         assert len(words) % num_lists == 0
         step = int(len(words) / num_lists)
@@ -99,6 +99,26 @@ class WordPool(object):
     def __getitem__(self, item):
         return self.lists[item]
 
-    def save(self, dest):
-        """Save the word pool as individual list files."""
-        raise NotImplementedError
+    def to_dict(self):
+        """Converts the word pool to a dict representation. Format::
+
+            {
+                "lists": [<list of lists>]
+            }
+
+        See :meth:`WordList.to_dict` for details.
+
+        """
+        return {
+            "lists": [words.to_dict() for words in self.lists]
+        }
+
+    def to_json(self, filename, indent=2):
+        """Save to a JSON file.
+
+        :param str filename:
+        :param int indent: Spaces to indent with.
+
+        """
+        with open(filename, "w") as f:
+            f.write(json.dumps(self.to_dict(), indent=indent))

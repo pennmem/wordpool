@@ -113,10 +113,28 @@ class TestWordPool:
         assert len(pool) == len(pool.lists)
 
     def test_iter(self, wordpool_en):
-        for words in WordPool(wordpool_en):
+        for words in WordPool(wordpool_en, 25):
             assert len(words) == 12
             for word in words:
                 assert type(word) is str
 
-    def test_save(self):
-        pass
+    def test_to_dict(self, wordpool_en):
+        pool = WordPool(wordpool_en, 25)
+        words = pool.to_dict()
+        assert len(words) == 1
+        assert "lists" in words
+        assert isinstance(words["lists"], list)
+        for list_ in words["lists"]:
+            assert isinstance(list_, dict)
+            assert "metadata" in list_
+            assert "words" in list_
+            assert len(list_["words"]) == 12
+
+    def test_to_json(self, wordpool_en, tempdir):
+        filename = osp.join(tempdir, "out.json")
+        pool = WordPool(wordpool_en)
+        pool.to_json(filename)
+        with open(filename) as f:
+            saved = json.load(f)
+            assert len(saved) == 1
+            assert "lists" in saved
