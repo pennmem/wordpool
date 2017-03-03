@@ -10,7 +10,7 @@ def read_list(filename):
     :returns: list of words
 
     """
-    words = resource_string("wordpool.data", filename).decode()
+    words = resource_string("wordpool.data", filename).decode("utf-8")
     if filename.endswith(".json"):
         return json.loads(words)["words"]
     else:
