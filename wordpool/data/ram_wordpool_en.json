@@ -1,5 +1,5 @@
 {
-  "pool": [
+  "words": [
     "ANT",
     "APE",
     "ARK",
@@ -300,5 +300,8 @@
     "WORM",
     "YARD",
     "ZOO"
-  ]
+  ],
+  "metadata": {
+    "created": 1488571772.58622
+  }
 }

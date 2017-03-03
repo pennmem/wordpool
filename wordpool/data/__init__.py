@@ -12,6 +12,6 @@ def read_list(filename):
     """
     words = resource_string("wordpool.data", filename).decode()
     if filename.endswith(".json"):
-        return json.loads(words)["pool"]
+        return json.loads(words)["words"]
     else:
         return words.split()
