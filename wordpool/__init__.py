@@ -62,6 +62,13 @@ class WordList(list):
         with open(filename, "w") as outfile:
             json.dump(self.to_dict(), outfile, indent=indent)
 
+    @classmethod
+    def from_json(cls, filename):
+        """Create a :class:`WordList` instance from a saved JSON file."""
+        with open(filename) as infile:
+            data = json.load(infile)
+        return cls(data["words"], data["metadata"])
+
     def to_text(self, filename, delimiter="\n"):
         """Save the list of words only to a plaintext file.
 

@@ -24,6 +24,11 @@ def wordpool_list():
 
 
 @pytest.fixture
+def wordpool_json():
+    return osp.join("wordpool", "data", "ram_wordpool_en.json")
+
+
+@pytest.fixture
 def tempdir():
     directory = mkdtemp()
     yield directory
@@ -60,6 +65,11 @@ class TestWordList:
             assert saved["words"] == words
             assert "metadata" in saved
             assert saved["metadata"] == words.metadata
+
+    def test_from_json(self, wordpool_json):
+        wlist = WordList.from_json(wordpool_json)
+        assert isinstance(wlist, WordList)
+        assert wlist.metadata["created"] == 1488571772.58622
 
     def test_to_text(self, wordpool_en, tempdir):
         words = WordList(wordpool_en)
