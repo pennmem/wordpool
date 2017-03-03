@@ -5,6 +5,8 @@ import codecs
 # import unicodedata
 import six
 
+__version__ = "0.1.dev"
+
 
 class WordList(list):
     """A single list of words.
