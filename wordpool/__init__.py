@@ -3,6 +3,7 @@ import json
 import random
 import codecs
 # import unicodedata
+import random
 import six
 
 __version__ = "0.1.dev"
@@ -36,6 +37,17 @@ class WordList(list):
         """
         random.shuffle(self)
         return self
+
+    def choose(self, n):
+        """Randomly select n words from the list.
+
+        :param int n: Number of words to select.
+        :returns: new :class:`WordList` instance.
+
+        """
+        assert 0 < n <= len(self)
+        words = random.sample(self, n)
+        return WordList(words)
 
     def to_dict(self):
         """Convert to a dict of the form::

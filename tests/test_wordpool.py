@@ -5,6 +5,7 @@ import shutil
 from collections import Counter
 import itertools
 from tempfile import mkdtemp
+import string
 import json
 import pytest
 import numpy as np
@@ -44,6 +45,17 @@ class TestWordList:
         assert len(res) is num
         for n in range(num):
             assert str(n) in res
+
+    def test_choose(self):
+        wordlist = WordList([c for c in string.ascii_letters])
+
+        for n in range(1, len(wordlist) + 1):
+            choice = wordlist.choose(n)
+            assert isinstance(choice, WordList)
+            assert len(choice) is n
+            for word in choice:
+                assert word in wordlist
+
 
     def test_to_dict(self):
         words = ["abc", "def"]
