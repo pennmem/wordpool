@@ -123,12 +123,16 @@ class WordPool(object):
     def __getitem__(self, item):
         return self.lists[item]
 
-    def shuffle_lists(self):
+    def shuffle_lists(self, frozen=[]):
         """Shuffle within lists in the pool (i.e., shuffle each list but do not
         move any words between lists. Returns self.
 
+        :param list frozen: Indices of lists to not shuffle.
+
         """
-        for list_ in self.lists:
+        for n, list_ in enumerate(self.lists):
+            if n in frozen:
+                continue
             list_.shuffle()
         return self
 

@@ -7,6 +7,8 @@ import itertools
 from tempfile import mkdtemp
 import string
 import json
+import random
+from copy import deepcopy
 import pytest
 import numpy as np
 
@@ -121,6 +123,13 @@ class TestWordPool:
         pool.shuffle_lists()
         for n, list_ in enumerate(pool.lists):
             assert words[n].tolist() != list_
+
+        pool = WordPool(words.tolist())
+        frozen = random.sample(range(len(pool.lists)), 5)
+        old_pool = deepcopy(pool)
+        pool.shuffle_lists(frozen)
+        for n in frozen:
+            assert old_pool.lists[n] == pool.lists[n]
 
     def test_to_dict(self, wordpool_list):
         pool = WordPool([wordpool_list])
