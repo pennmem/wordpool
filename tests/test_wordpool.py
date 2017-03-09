@@ -169,6 +169,16 @@ class TestWordPool:
             assert len(saved) == 1
             assert "lists" in saved
 
+    def test_from_json(self, wordpool_list, tempdir):
+        filename = osp.join(tempdir, "wordpool.json")
+
+        pool = WordPool([wordpool_list])
+        pool.shuffle_lists()
+        pool.to_json(filename)
+
+        pool2 = WordPool.from_json(filename)
+        assert pool2.lists == pool.lists
+
     def test_to_dataframe(self):
         lists = [
             WordList(["a"], {"one": 1}),

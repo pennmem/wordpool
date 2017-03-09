@@ -198,3 +198,13 @@ class WordPool(object):
         """
         with open(filename, "w") as f:
             f.write(json.dumps(self.to_dict(), indent=indent))
+
+    @classmethod
+    def from_json(cls, filename):
+        """Return a new :class:`WordPool` from JSON."""
+        with open(filename, "r") as f:
+            jsonized = json.load(f)
+
+        lists = [WordList(list_["words"], list_["metadata"])
+                 for list_ in jsonized["lists"]]
+        return WordPool(lists)
