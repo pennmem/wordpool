@@ -6,6 +6,11 @@ import codecs
 import random
 import six
 
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
 __version__ = "0.1.dev"
 
 
@@ -62,6 +67,20 @@ class WordList(list):
             "metadata": self.metadata,
             "words": [word for word in self]
         }
+
+    def to_dataframe(self):
+        """Convert to a :class:`DataFrame`. Metadata will be repeated for each
+        word in the list.
+
+        """
+        if pd is None:
+            raise RuntimeError("You must install pandas to convert to a DataFrame!")
+        words = [word for word in self]
+        d = {
+            key: [value]*len(words) for key, value in self.metadata.items()
+        }
+        d.update({"word": words})
+        return pd.DataFrame(d)
 
     def to_json(self, filename, indent=2):
         """Save the list to a JSON file with form the same as with
@@ -149,6 +168,13 @@ class WordPool(object):
         return {
             "lists": [words.to_dict() for words in self.lists]
         }
+
+    def to_dataframe(self):
+        """Convert the pool to a :class:`pd.DataFrame`."""
+        if pd is None:
+            raise RutimeError("Please install Pandas")
+        dfs = [list_.to_dataframe() for list_ in self.lists]
+        return pd.concat(dfs)
 
     def to_json(self, filename, indent=2):
         """Save to a JSON file.

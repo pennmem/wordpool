@@ -69,6 +69,23 @@ class TestWordList:
         assert "words" in d
         assert d["words"] == words
 
+    def test_to_dataframe(self, wordpool_en):
+        meta = {
+            "string": "value",
+            "int": 1
+        }
+        words = WordList(wordpool_en, meta)
+
+        df = words.to_dataframe()
+        assert "string" in df.columns
+        assert "int" in df.columns
+        assert "created" in df.columns
+        assert len(df.columns) == 4
+        assert df.word.count() == len(words)
+        assert df.string.count() == len(words)
+        assert df.int.count() == len(words)
+        assert df.created.count() == len(words)
+
     def test_to_json(self, wordpool_en, tempdir):
         words = WordList(wordpool_en)
         filename = osp.join(tempdir, "out.json")
@@ -151,3 +168,18 @@ class TestWordPool:
             saved = json.load(f)
             assert len(saved) == 1
             assert "lists" in saved
+
+    def test_to_dataframe(self):
+        lists = [
+            WordList(["a"], {"one": 1}),
+            WordList(["b"], {"one": 2}),
+            WordList(["c"])
+        ]
+        pool = WordPool(lists)
+        df = pool.to_dataframe()
+        assert len(df.word) == len(lists)
+        assert "one" in df.columns
+        assert len(df.one) == len(lists)
+        for n in range(1, len(lists)):
+            assert n in df.one.unique()
+        assert len(df.one.unique()) == len(lists)
