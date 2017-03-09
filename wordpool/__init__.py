@@ -4,6 +4,7 @@ import random
 import codecs
 # import unicodedata
 import random
+from copy import deepcopy
 import six
 
 try:
@@ -169,11 +170,23 @@ class WordPool(object):
             "lists": [words.to_dict() for words in self.lists]
         }
 
-    def to_dataframe(self):
-        """Convert the pool to a :class:`pd.DataFrame`."""
+    def to_dataframe(self, add_listno=True):
+        """Convert the pool to a :class:`pd.DataFrame`.
+
+        :param bool add_listno: When True, include a `listno` column to keep
+            track of which list number a given word is from.
+
+        """
         if pd is None:
             raise RutimeError("Please install Pandas")
-        dfs = [list_.to_dataframe() for list_ in self.lists]
+
+        dfs = []
+        for listno, list_ in enumerate(self.lists):
+            df = list_.to_dataframe()
+            if add_listno:
+                df["listno"] = [listno]*len(list_)
+            dfs.append(df)
+
         return pd.concat(dfs)
 
     def to_json(self, filename, indent=2):

@@ -183,3 +183,7 @@ class TestWordPool:
         for n in range(1, len(lists)):
             assert n in df.one.unique()
         assert len(df.one.unique()) == len(lists)
+        assert "listno" in df.columns
+
+        df = pool.to_dataframe(add_listno=False)
+        assert "listno" not in df.columns
