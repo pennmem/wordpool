@@ -1,9 +1,6 @@
 import time
 import random
 import codecs
-# import unicodedata
-import random
-from copy import deepcopy
 import six
 
 try:
