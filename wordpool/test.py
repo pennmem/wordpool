@@ -3,6 +3,7 @@
 import os.path as osp
 import shutil
 from tempfile import mkdtemp
+import subprocess
 import pytest
 
 import wordpool
@@ -31,6 +32,10 @@ def test_create(pool, catpool):
     assert "word" in pool
     assert "word" in catpool
     assert "category" in catpool
+    output = subprocess.check_output("git rev-parse --show-toplevel".split())
+    root = output.decode().strip()
+    other = wordpool.load(osp.join(root, "wordpool", "data", "ram_wordpool_en.txt"), False)
+    assert "word" in other
 
 
 def test_assign_list_numbers(catpool):
