@@ -6,7 +6,6 @@ from collections import Counter
 import itertools
 from tempfile import mkdtemp
 import string
-import json
 import random
 from copy import deepcopy
 import pytest
@@ -24,11 +23,6 @@ def wordpool_en():
 def wordpool_list():
     with open(osp.join("wordpool", "data", "ram_wordpool_en.txt")) as f:
         yield f.read().split()
-
-
-@pytest.fixture
-def wordpool_json():
-    return osp.join("wordpool", "data", "ram_wordpool_en.json")
 
 
 @pytest.fixture
@@ -58,7 +52,6 @@ class TestWordList:
             for word in choice:
                 assert word in wordlist
 
-
     def test_to_dict(self):
         words = ["abc", "def"]
         meta = {"thing": 1}
@@ -85,22 +78,6 @@ class TestWordList:
         assert df.string.count() == len(words)
         assert df.int.count() == len(words)
         assert df.created.count() == len(words)
-
-    def test_to_json(self, wordpool_en, tempdir):
-        words = WordList(wordpool_en)
-        filename = osp.join(tempdir, "out.json")
-        words.to_json(filename)
-        with open(filename) as f:
-            saved = json.load(f)
-            assert "words" in saved
-            assert saved["words"] == words
-            assert "metadata" in saved
-            assert saved["metadata"] == words.metadata
-
-    def test_from_json(self, wordpool_json):
-        wlist = WordList.from_json(wordpool_json)
-        assert isinstance(wlist, WordList)
-        assert wlist.metadata["created"] == 1488571772.58622
 
     def test_to_text(self, wordpool_en, tempdir):
         words = WordList(wordpool_en)
@@ -159,25 +136,6 @@ class TestWordPool:
             assert "metadata" in list_
             assert "words" in list_
             assert len(list_["words"]) == 300
-
-    def test_to_json(self, wordpool_list, tempdir):
-        filename = osp.join(tempdir, "out.json")
-        pool = WordPool([wordpool_list])
-        pool.to_json(filename)
-        with open(filename) as f:
-            saved = json.load(f)
-            assert len(saved) == 1
-            assert "lists" in saved
-
-    def test_from_json(self, wordpool_list, tempdir):
-        filename = osp.join(tempdir, "wordpool.json")
-
-        pool = WordPool([wordpool_list])
-        pool.shuffle_lists()
-        pool.to_json(filename)
-
-        pool2 = WordPool.from_json(filename)
-        assert pool2.lists == pool.lists
 
     def test_to_dataframe(self):
         lists = [

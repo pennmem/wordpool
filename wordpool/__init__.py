@@ -1,5 +1,4 @@
 import time
-import json
 import random
 import codecs
 # import unicodedata
@@ -12,7 +11,7 @@ try:
 except ImportError:
     pd = None
 
-__version__ = "0.1.dev"
+__version__ = "0.2.dev"
 
 
 class WordList(list):
@@ -82,24 +81,6 @@ class WordList(list):
         }
         d.update({"word": words})
         return pd.DataFrame(d)
-
-    def to_json(self, filename, indent=2):
-        """Save the list to a JSON file with form the same as with
-        :meth:`WordList.to_dict`.
-
-        :param str filename:
-        :param int indent: Spaces to indent resulting file with.
-
-        """
-        with open(filename, "w") as outfile:
-            json.dump(self.to_dict(), outfile, indent=indent)
-
-    @classmethod
-    def from_json(cls, filename):
-        """Create a :class:`WordList` instance from a saved JSON file."""
-        with open(filename) as infile:
-            data = json.load(infile)
-        return cls(data["words"], data["metadata"])
 
     def to_text(self, filename, delimiter="\n"):
         """Save the list of words only to a plaintext file.
@@ -188,23 +169,3 @@ class WordPool(object):
             dfs.append(df)
 
         return pd.concat(dfs)
-
-    def to_json(self, filename, indent=2):
-        """Save to a JSON file.
-
-        :param str filename:
-        :param int indent: Spaces to indent with.
-
-        """
-        with open(filename, "w") as f:
-            f.write(json.dumps(self.to_dict(), indent=indent))
-
-    @classmethod
-    def from_json(cls, filename):
-        """Return a new :class:`WordPool` from JSON."""
-        with open(filename, "r") as f:
-            jsonized = json.load(f)
-
-        lists = [WordList(list_["words"], list_["metadata"])
-                 for list_ in jsonized["lists"]]
-        return WordPool(lists)

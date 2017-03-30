@@ -8,6 +8,3 @@ def test_read_list():
 
     words = read_list("ram_wordpool_en.txt")
     assert words == pool
-
-    words = read_list("ram_wordpool_en.json")
-    assert words == pool
