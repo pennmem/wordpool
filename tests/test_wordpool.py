@@ -72,30 +72,4 @@ class TestWordPool:
             assert category == row.category
         assert catwords.df.index[0] == 0
 
-        # keeping some fixed
-
-    # def test_shuffle_within_lists(self, pool):
-    #     words = np.array(pool).reshape((25, 12))
-    #     pool = WordPool(words.tolist())
-    #     pool.shuffle_within_lists()
-    #     for n, list_ in enumerate(pool.lists):
-    #         assert words[n].tolist() != list_
-    #
-    #     pool = WordPool(words.tolist())
-    #     frozen = random.sample(range(len(pool.lists)), 5)
-    #     old_pool = deepcopy(pool)
-    #     pool.shuffle_within_lists(frozen)
-    #     for n in frozen:
-    #         assert old_pool.lists[n] == pool.lists[n]
-    #
-    # def test_to_dict(self, pool):
-    #     pool = WordPool([pool])
-    #     words = pool.to_dict()
-    #     assert len(words) == 1
-    #     assert "lists" in words
-    #     assert isinstance(words["lists"], list)
-    #     for list_ in words["lists"]:
-    #         assert isinstance(list_, dict)
-    #         assert "metadata" in list_
-    #         assert "words" in list_
-    #         assert len(list_["words"]) == 300
+        # TODO: keeping some fixed

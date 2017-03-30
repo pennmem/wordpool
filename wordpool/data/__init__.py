@@ -1,5 +1,5 @@
-import json
 from pkg_resources import resource_string
+import pandas as pd
 
 
 def read_list(filename):
@@ -7,11 +7,8 @@ def read_list(filename):
     package.
 
     :param str filename:
-    :returns: list of words
+    :rtype: pd.DataFrame
 
     """
     words = resource_string("wordpool.data", filename).decode("utf-8")
-    if filename.endswith(".json"):
-        return json.loads(words)["words"]
-    else:
-        return words.split()
+    return pd.read_table(words)
