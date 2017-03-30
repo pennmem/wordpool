@@ -36,10 +36,11 @@ def assign_list_numbers(df, n_lists):
     listnos = np.array(
         [[n]*words_per_list for n in range(n_lists)]).flatten()
     df["listno"] = listnos
+    return df
 
 
 def shuffle_words(df, frozen=[]):
-    """Shuffle words in place.
+    """Shuffle words.
 
     :param pd.DataFrame df: Input word pool
     :param list frozen: List of word numbers to exclude from shuffling.

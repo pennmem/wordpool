@@ -33,6 +33,17 @@ def test_create(pool, catpool):
     assert "category" in catpool
 
 
+def test_assign_list_numbers(catpool):
+    df = catpool.copy()
+    assigned = wordpool.assign_list_numbers(catpool, 25)
+    assert "listno" in assigned.columns
+    assert "word" in assigned.columns
+    assert "category" in assigned.columns
+    assert all(list(range(25)) == assigned.listno.unique())
+    assert all(df.word == assigned.word)
+    assert all(df.category == assigned.category)
+
+
 def test_shuffle_words(pool, catpool):
     df = pool.copy()
     catdf = catpool.copy()
