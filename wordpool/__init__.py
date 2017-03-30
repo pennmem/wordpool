@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import pandas as pd
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 
 __version__ = "0.2.dev"
 
@@ -17,7 +17,7 @@ def load(filename, from_data_package=True):
 
     """
     if from_data_package:
-        src = resource_string("wordpool.data", filename).decode("utf-8")
+        src = resource_filename("wordpool.data", filename)
     else:
         src = filename
     return pd.read_table(src)
