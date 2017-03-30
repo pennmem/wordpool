@@ -3,12 +3,7 @@
 import os.path as osp
 import shutil
 from tempfile import mkdtemp
-import random
-from copy import deepcopy
 import pytest
-
-import numpy as np
-import pandas as pd
 
 from wordpool import WordPool
 

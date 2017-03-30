@@ -1,8 +1,21 @@
 import random
 import numpy as np
 import pandas as pd
+from pkg_resources import resource_string
 
 __version__ = "0.2.dev"
+
+
+def load(filename):
+    """Return contents of a word list contained in the wordpool.data
+    package.
+
+    :param str filename:
+    :rtype: pd.DataFrame
+
+    """
+    words = resource_string("wordpool.data", filename).decode("utf-8")
+    return pd.read_table(words)
 
 
 class WordPool(object):
