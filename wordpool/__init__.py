@@ -6,16 +6,21 @@ from pkg_resources import resource_string
 __version__ = "0.2.dev"
 
 
-def load(filename):
-    """Return contents of a word list contained in the wordpool.data
-    package.
+def load(filename, from_data_package=True):
+    """Return contents of a word list.
 
     :param str filename:
+    :param bool from_data_package: When True (the default), load data from the
+        ``wordpool.data`` package. Otherwise, treat the filename as an absolute
+        path to load arbitrary wordpools from.
     :rtype: pd.DataFrame
 
     """
-    words = resource_string("wordpool.data", filename).decode("utf-8")
-    return pd.read_table(words)
+    if from_data_package:
+        src = resource_string("wordpool.data", filename).decode("utf-8")
+    else:
+        src = filename
+    return pd.read_table(src)
 
 
 class WordPool(object):
