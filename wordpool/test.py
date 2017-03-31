@@ -2,7 +2,6 @@
 
 import os.path as osp
 import subprocess
-import numpy as np
 import pytest
 
 import wordpool
