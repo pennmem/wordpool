@@ -1,6 +1,9 @@
 wordpool
 ========
 
+.. image:: https://travis-ci.org/pennmem/wordpool.svg?branch=master
+    :target: https://travis-ci.org/pennmem/wordpool
+
 Word pool generation and utilities for verbal memory experiments.
 
 
