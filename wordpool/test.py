@@ -73,3 +73,7 @@ def test_shuffle_within_lists(pool, catpool):
 
     for listno in catwords.listno.unique():
         assert not (catwords[catwords.listno == listno].word == catdf[words.listno == listno].word).all()
+
+
+if __name__ == "__main__":
+    pytest.main()
