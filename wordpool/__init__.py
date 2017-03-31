@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from pkg_resources import resource_filename
 
-__version__ = "0.2.dev"
+__version__ = "0.2.0"
 
 
 def load(filename, from_data_package=True):

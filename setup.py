@@ -20,7 +20,6 @@ setup(
     ],
     tests_require=[
         "pytest",
-        "pytest-cov",
-        "numpy"
+        "pytest-cov"
     ]
 )
