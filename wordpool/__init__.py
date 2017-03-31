@@ -1,210 +1,69 @@
-import time
-import json
-import random
-import codecs
-# import unicodedata
-import random
-from copy import deepcopy
-import six
+import numpy as np
+import pandas as pd
+from pkg_resources import resource_filename
 
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
-
-__version__ = "0.1.dev"
+__version__ = "0.2.dev"
 
 
-class WordList(list):
-    """A single list of words.
+def load(filename, from_data_package=True):
+    """Return contents of a word list.
 
-    :param iterable: If a string type, try to open a file. Otherwise, just call
-        the normal list constructor.
-    :param dict metadata: A dict of metadata to associate with the list. If no
-        ``created`` key is given, one will be added which provides a timestamp
-        in seconds since the epoch.
+    :param str filename:
+    :param bool from_data_package: When True (the default), load data from the
+        ``wordpool.data`` package. Otherwise, treat the filename as an absolute
+        path to load arbitrary wordpools from.
+    :rtype: pd.DataFrame
 
     """
-    def __init__(self, iterable=None, metadata=None):
-        if isinstance(iterable, (six.string_types, six.text_type)):
-            with codecs.open(iterable, encoding="utf-8") as f:
-                super(WordList, self).__init__(sorted(f.read().split()))
-        else:
-            super(WordList, self).__init__(iterable)
-
-        self.metadata = metadata or {}
-        if "created" not in self.metadata:
-            self.metadata["created"] = time.time()
-
-    def shuffle(self):
-        """Shuffle the list in place. Also returns itself to facilitate
-        chaining.
-
-        """
-        random.shuffle(self)
-        return self
-
-    def choose(self, n):
-        """Randomly select n words from the list.
-
-        :param int n: Number of words to select.
-        :returns: new :class:`WordList` instance.
-
-        """
-        assert 0 < n <= len(self)
-        words = random.sample(self, n)
-        return WordList(words)
-
-    def to_dict(self):
-        """Convert to a dict of the form::
-
-            {
-                "metadata": self.metadata,
-                "words": [<list of words in self>]
-            }
-
-        """
-        return {
-            "metadata": self.metadata,
-            "words": [word for word in self]
-        }
-
-    def to_dataframe(self):
-        """Convert to a :class:`DataFrame`. Metadata will be repeated for each
-        word in the list.
-
-        """
-        if pd is None:
-            raise RuntimeError("You must install pandas to convert to a DataFrame!")
-        words = [word for word in self]
-        d = {
-            key: [value]*len(words) for key, value in self.metadata.items()
-        }
-        d.update({"word": words})
-        return pd.DataFrame(d)
-
-    def to_json(self, filename, indent=2):
-        """Save the list to a JSON file with form the same as with
-        :meth:`WordList.to_dict`.
-
-        :param str filename:
-        :param int indent: Spaces to indent resulting file with.
-
-        """
-        with open(filename, "w") as outfile:
-            json.dump(self.to_dict(), outfile, indent=indent)
-
-    @classmethod
-    def from_json(cls, filename):
-        """Create a :class:`WordList` instance from a saved JSON file."""
-        with open(filename) as infile:
-            data = json.load(infile)
-        return cls(data["words"], data["metadata"])
-
-    def to_text(self, filename, delimiter="\n"):
-        """Save the list of words only to a plaintext file.
-
-        :param str filename:
-        :param str delimiter:
-
-        """
-        with open(filename, "w") as outfile:
-            outfile.write(delimiter.join(self))
+    if from_data_package:
+        src = resource_filename("wordpool.data", filename)
+    else:
+        src = filename
+    return pd.read_table(src)
 
 
-class WordPool(object):
-    """Handles operations for entire word pools. Here, a word pool is
-    considered to be made up of a series one or more word lists.
+def assign_list_numbers(df, n_lists):
+    """Assign or reassign list numbers to all words in the pool.
 
-    .. note:: Word lists must contain the same number of words!
-
-    :param list lists: Word lists to include (coerced to :class:`WordList` if
-       not already).
-    :raises: AssertionError when lists are not all the same length.
+    :param pd.DataFrame df: Input word pool
+    :param int n_lists: Total number of lists.
+    :returns: Word pool with list numbers assigned
 
     """
-    def __init__(self, lists):
-        self.lists = [WordList(list_) if not isinstance(list_, WordList) else list_
-                      for list_ in lists]
-        length = len(self.lists[0])
-        for list_ in self.lists:
-            assert length == len(list_)
+    assert len(df) % n_lists == 0
+    words_per_list = int(len(df) / n_lists)
+    listnos = np.array(
+        [[n]*words_per_list for n in range(n_lists)]).flatten()
+    df["listno"] = listnos
+    return df
 
-    def __str__(self):
-        return str(self.lists)
 
-    def __len__(self):
-        return len(self.lists)
+def shuffle_words(df):
+    """Shuffle words.
 
-    def __iter__(self):
-        for word_list in self.lists:
-            yield word_list
+    :param pd.DataFrame df: Input word pool
+    :returns: Shuffled pool
 
-    def __getitem__(self, item):
-        return self.lists[item]
+    """
+    shuffled = df.reindex(np.random.permutation(df.index))
+    return shuffled.reset_index(drop=True)
 
-    def shuffle_lists(self, frozen=[]):
-        """Shuffle within lists in the pool (i.e., shuffle each list but do not
-        move any words between lists. Returns self.
 
-        :param list frozen: Indices of lists to not shuffle.
+def shuffle_within_lists(df):
+    """Shuffle within lists in the pool (i.e., shuffle each list but do not
+    move any words between lists. This requires that list
+    numbers have alreay been assigned.
 
-        """
-        for n, list_ in enumerate(self.lists):
-            if n in frozen:
-                continue
-            list_.shuffle()
-        return self
+    :param pd.DataFrame df: Input word pool
+    :returns: Pool with lists shuffled
 
-    def to_dict(self):
-        """Converts the word pool to a dict representation. Format::
+    """
+    if "listno" not in df.columns:
+        raise RuntimeError("You must assign list numbers first.")
 
-            {
-                "lists": [<list of lists>]
-            }
+    shuffled = []
+    for listno in df.listno.unique():
+        list_ = df[df.listno == listno]
+        shuffled.append(list_.reindex(np.random.permutation(list_.index)))
 
-        See :meth:`WordList.to_dict` for details.
-
-        """
-        return {
-            "lists": [words.to_dict() for words in self.lists]
-        }
-
-    def to_dataframe(self, add_listno=True):
-        """Convert the pool to a :class:`pd.DataFrame`.
-
-        :param bool add_listno: When True, include a `listno` column to keep
-            track of which list number a given word is from.
-
-        """
-        if pd is None:
-            raise RutimeError("Please install Pandas")
-
-        dfs = []
-        for listno, list_ in enumerate(self.lists):
-            df = list_.to_dataframe()
-            if add_listno:
-                df["listno"] = [listno]*len(list_)
-            dfs.append(df)
-
-        return pd.concat(dfs)
-
-    def to_json(self, filename, indent=2):
-        """Save to a JSON file.
-
-        :param str filename:
-        :param int indent: Spaces to indent with.
-
-        """
-        with open(filename, "w") as f:
-            f.write(json.dumps(self.to_dict(), indent=indent))
-
-    @classmethod
-    def from_json(cls, filename):
-        """Return a new :class:`WordPool` from JSON."""
-        with open(filename, "r") as f:
-            jsonized = json.load(f)
-
-        lists = [WordList(list_["words"], list_["metadata"])
-                 for list_ in jsonized["lists"]]
-        return WordPool(lists)
+    return pd.concat(shuffled).reset_index(drop=True)
