@@ -39,6 +39,16 @@ def test_assign_list_numbers(catpool):
     assert all(df.word == assigned.word)
     assert all(df.category == assigned.category)
 
+    # type and start, stop
+    assert assigned.listno.dtype == int
+    assert assigned.listno.iloc[0] == 0
+    assert assigned.listno.iloc[-1] == 24
+
+    # specify non-default start index
+    assigned = wordpool.assign_list_numbers(catpool, 25, 1)
+    assert assigned.listno.iloc[0] == 1
+    assert assigned.listno.iloc[-1] == 25
+
 
 def test_shuffle_words(pool, catpool):
     df = pool.copy()

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from pkg_resources import resource_filename
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 def load(filename, from_data_package=True):
@@ -22,18 +22,19 @@ def load(filename, from_data_package=True):
     return pd.read_table(src)
 
 
-def assign_list_numbers(df, n_lists):
+def assign_list_numbers(df, n_lists, start=0):
     """Assign or reassign list numbers to all words in the pool.
 
     :param pd.DataFrame df: Input word pool
     :param int n_lists: Total number of lists.
+    :param int start: Start number for lists.
     :returns: Word pool with list numbers assigned
 
     """
     assert len(df) % n_lists == 0
     words_per_list = int(len(df) / n_lists)
     listnos = np.array(
-        [[n]*words_per_list for n in range(n_lists)]).flatten()
+        [[n]*words_per_list for n in range(start, start + n_lists)], dtype=int).flatten()
     df["listno"] = listnos
     return df
 
