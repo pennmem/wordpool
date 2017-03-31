@@ -12,7 +12,8 @@ setup(
         "": ["*.txt", "*.json"]
     },
     install_requires=[
-        "six"
+        "numpy",
+        "pandas"
     ],
     setup_requires=[
         "pytest-runner"
