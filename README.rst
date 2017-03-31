@@ -9,9 +9,9 @@ Included word pools
 
 ``wordpool`` ships with some word pools that can be accessed as follows::
 
-  import wordpool.data
+  import wordpool
 
-  words = wordpool.data.read_list(<filename>)
+  words = wordpool.load("ram_categorized_en.txt")
 
 Included word pools are:
 
@@ -19,4 +19,6 @@ Included word pools are:
 * ``practice_sp.txt``
 * ``ram_wordpool_en.txt``
 * ``ram_wordpool_sp.txt``
+* ``ram_categorized_en.txt``
+* ``ram_categorized_sp.txt``
 * ``REC1_lures_en.txt``
