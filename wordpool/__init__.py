@@ -39,37 +39,32 @@ def assign_list_numbers(df, n_lists):
     return df
 
 
-def shuffle_words(df, frozen=[]):
+def shuffle_words(df):
     """Shuffle words.
 
     :param pd.DataFrame df: Input word pool
-    :param list frozen: List of word numbers to exclude from shuffling.
     :returns: Shuffled pool
 
     """
-    frozen_words = df[df.index.isin(frozen)]
-    shuffle_words = df[~df.index.isin(frozen)]
-    shuffled = shuffle_words.reindex(np.random.permutation(shuffle_words.index))
-    return pd.concat([frozen_words, shuffled]).reset_index(drop=True)
+    shuffled = df.reindex(np.random.permutation(df.index))
+    return shuffled.reset_index(drop=True)
 
 
-def shuffle_within_lists(df, frozen=[]):
+def shuffle_within_lists(df):
     """Shuffle within lists in the pool (i.e., shuffle each list but do not
     move any words between lists. This requires that list
     numbers have alreay been assigned.
 
     :param pd.DataFrame df: Input word pool
-    :param list frozen: List numbers to not shuffle.
     :returns: Pool with lists shuffled
 
     """
-    frozen_lists = df[df.listno.isin(frozen)]
-    shuffle_lists = df[~df.listno.isin(frozen)]
+    if "listno" not in df.columns:
+        raise RuntimeError("You must assign list numbers first.")
 
-    shuffled_lists = []
-    for listno in shuffle_lists.listno.unique():
-        list_ = shuffle_lists[shuffle_lists.listno == listno]
-        list_.apply(lambda col: sorted(col, key=lambda _: random.random()))
-        shuffled_lists.append(list_)
+    shuffled = []
+    for listno in df.listno.unique():
+        list_ = df[df.listno == listno]
+        shuffled.append(list_.reindex(np.random.permutation(list_.index)))
 
-    return pd.concat([frozen_lists, shuffle_lists])
+    return pd.concat(shuffled).reset_index(drop=True)

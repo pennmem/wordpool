@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os.path as osp
-import shutil
-from tempfile import mkdtemp
 import subprocess
+import numpy as np
 import pytest
 
 import wordpool
@@ -19,13 +18,6 @@ def pool(language="en"):
 @pytest.fixture
 def catpool(language="en"):
     yield wordpool.load("ram_categorized_{:s}.txt".format(language))
-
-
-@pytest.fixture
-def tempdir():
-    directory = mkdtemp()
-    yield directory
-    shutil.rmtree(directory, ignore_errors=True)
 
 
 def test_create(pool, catpool):
@@ -53,7 +45,6 @@ def test_shuffle_words(pool, catpool):
     df = pool.copy()
     catdf = catpool.copy()
 
-    # shuffling all
     words = wordpool.shuffle_words(pool)
     assert any((words != df).any())
     catwords = wordpool.shuffle_words(catpool)
@@ -63,4 +54,23 @@ def test_shuffle_words(pool, catpool):
         assert category == row.category
     assert catwords.index[0] == 0
 
-    # TODO: keeping some fixed
+
+def test_shuffle_within_lists(pool, catpool):
+    df = pool.copy()
+    catdf = catpool.copy()
+
+    with pytest.raises(RuntimeError):
+        words = wordpool.shuffle_within_lists(df)
+    with pytest.raises(RuntimeError):
+        catwords = wordpool.shuffle_within_lists(catdf)
+
+    df = wordpool.assign_list_numbers(df, 25)
+    catdf = wordpool.assign_list_numbers(catdf, 25)
+    words = wordpool.shuffle_within_lists(df)
+    catwords = wordpool.shuffle_within_lists(catdf)
+
+    for listno in words.listno.unique():
+        assert not (words[words.listno == listno].word == df[words.listno == listno].word).all()
+
+    for listno in catwords.listno.unique():
+        assert not (catwords[catwords.listno == listno].word == catdf[words.listno == listno].word).all()
