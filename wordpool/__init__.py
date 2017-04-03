@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from pkg_resources import resource_filename
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 
 def load(filename, from_data_package=True):
@@ -50,6 +50,25 @@ def shuffle_words(df):
     return shuffled.reset_index(drop=True)
 
 
+def shuffle_within_groups(df, column):
+    """Shuffle within groups of words based on some common values in a column.
+
+    :param pd.DataFrame df: Input word pool
+    :param str column: Column name.
+    :returns: Pool with groups shuffled.
+
+    """
+    if column not in df.columns:
+        raise RuntimeError("Column {} not found in DataFrame".format(column))
+
+    shuffled = []
+    for col in df[column].unique():
+        list_ = df[df[column] == col]
+        shuffled.append(list_.reindex(np.random.permutation(list_.index)))
+
+    return pd.concat(shuffled).reset_index(drop=True)
+
+
 def shuffle_within_lists(df):
     """Shuffle within lists in the pool (i.e., shuffle each list but do not
     move any words between lists. This requires that list
@@ -62,9 +81,4 @@ def shuffle_within_lists(df):
     if "listno" not in df.columns:
         raise RuntimeError("You must assign list numbers first.")
 
-    shuffled = []
-    for listno in df.listno.unique():
-        list_ = df[df.listno == listno]
-        shuffled.append(list_.reindex(np.random.permutation(list_.index)))
-
-    return pd.concat(shuffled).reset_index(drop=True)
+    return shuffle_within_groups(df, "listno")

@@ -64,6 +64,19 @@ def test_shuffle_words(pool, catpool):
     assert catwords.index[0] == 0
 
 
+def test_shuffle_within_groups(catpool):
+    df = catpool.copy()
+
+    with pytest.raises(RuntimeError):
+        wordpool.shuffle_within_groups(df, "none")
+
+    shuffled = wordpool.shuffle_within_groups(df, "category")
+    for i, row in shuffled.iterrows():
+        assert df.loc[i].category == shuffled.loc[i].category
+
+    assert not (df.word == shuffled.word).all()
+
+
 def test_shuffle_within_lists(pool, catpool):
     df = pool.copy()
     catdf = catpool.copy()
@@ -85,5 +98,5 @@ def test_shuffle_within_lists(pool, catpool):
         assert not (catwords[catwords.listno == listno].word == catdf[words.listno == listno].word).all()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pytest.main()
