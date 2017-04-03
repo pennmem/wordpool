@@ -99,4 +99,5 @@ def test_shuffle_within_lists(pool, catpool):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    pytest.main()
+    import sys
+    sys.exit(pytest.main(sys.argv[1:]))
