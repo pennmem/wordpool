@@ -20,6 +20,8 @@ Included word pools are:
 
 * ``practice_en.txt``
 * ``practice_sp.txt``
+* ``practice_cat_en.txt``
+* ``practice_cat_sp.txt``
 * ``ram_wordpool_en.txt``
 * ``ram_wordpool_sp.txt``
 * ``ram_categorized_en.txt``
