@@ -16,14 +16,6 @@ Included word pools
 
   words = wordpool.load("ram_categorized_en.txt")
 
-Included word pools are:
+Included word pools can be shown with::
 
-* ``practice_en.txt``
-* ``practice_sp.txt``
-* ``practice_cat_en.txt``
-* ``practice_cat_sp.txt``
-* ``ram_wordpool_en.txt``
-* ``ram_wordpool_sp.txt``
-* ``ram_categorized_en.txt``
-* ``ram_categorized_sp.txt``
-* ``REC1_lures_en.txt``
+  print(wordpool.list_available_pools())
