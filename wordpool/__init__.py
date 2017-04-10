@@ -1,8 +1,14 @@
 import numpy as np
 import pandas as pd
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename, resource_listdir
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
+
+
+def list_available_pools():
+    """Returns a list of the pools available in the `wordpool.data` package."""
+    files = resource_listdir("wordpool", "data")
+    return [f for f in files if f.endswith(".txt")]
 
 
 def load(filename, from_data_package=True):

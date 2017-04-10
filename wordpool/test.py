@@ -19,6 +19,15 @@ def catpool(language="en"):
     yield wordpool.load("ram_categorized_{:s}.txt".format(language))
 
 
+def test_list_available_pools():
+    pools = wordpool.list_available_pools()
+    assert isinstance(pools, list)
+    assert len(pools) > 0
+    for name in pools:
+        assert isinstance(name, str)
+        assert name.endswith(".txt")
+
+
 def test_create(pool, catpool):
     assert "word" in pool
     assert "word" in catpool
