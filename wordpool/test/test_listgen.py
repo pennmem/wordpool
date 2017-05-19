@@ -76,7 +76,7 @@ class TestFR:
         with pytest.raises(AssertionError):
             listgen.fr.generate_session_pool(13)
         with pytest.raises(AssertionError):
-            listgen.fr.generate_session_pool(num_lists=random.randrange(26))
+            listgen.fr.generate_session_pool(num_lists=27)
         with pytest.raises(AssertionError):
             listgen.fr.generate_session_pool(language="DA")
 
