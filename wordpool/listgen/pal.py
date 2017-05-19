@@ -22,7 +22,7 @@ def generate_n_session_pairs(n_sessions, n_lists=25, n_pairs=6, language='EN'):
     shuffle(words)
     words = deque([w[0] for w in words])
     sess_pools = []
-    indices = np.random.choice(np.arange(n_words), size=n_sessions, replace=False)
+    indices = np.random.choice(n_words/2, size=n_sessions, replace=False)
     for i in indices:
         words.rotate(i)
         word1 = list(words)[:int(n_words / 2)]
