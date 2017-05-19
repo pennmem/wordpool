@@ -1,9 +1,9 @@
 from collections import deque
 import numpy as np
-from numpy.random import shuffle, randint, choice
+from numpy.random import shuffle
 import pandas as pd
 
-from . import load, assign_list_numbers
+from .. import load, assign_list_numbers
 
 
 wordpools = {
@@ -16,7 +16,6 @@ PRACTICE_LIST_SP = load("practice_sp.txt")
 
 
 def generate_n_session_pairs(n_sessions, n_lists=25, n_pairs=6, language='EN'):
-
     words = wordpools[language].values
     n_words = len(words)
     assert n_lists*n_pairs*2 == n_words
@@ -26,16 +25,17 @@ def generate_n_session_pairs(n_sessions, n_lists=25, n_pairs=6, language='EN'):
     indices = np.random.choice(np.arange(n_words), size=n_sessions, replace=False)
     for i in indices:
         words.rotate(i)
-        word1 = list(words)[:n_words/2]
-        word2 = list(words)[n_words/2:]
+        word1 = list(words)[:int(n_words / 2)]
+        word2 = list(words)[int(n_words / 2):]
         word2.reverse()
-        new_session = pd.DataFrame(np.array([word1,word2]).T,columns=['word1','word2'])
+        new_session = pd.DataFrame(np.array([word1, word2]).T, columns=['word1', 'word2'])
         sess_pools.append(add_fields(new_session))
         words.rotate(-1*i)
     return sess_pools
 
 
-def add_fields(word_lists=None,pairs_per_list = 6, num_lists=25,language='EN'):
+def add_fields(word_lists=None, pairs_per_list = 6, num_lists=25,
+               language='EN'):
     """Generate the pool of words for a single task session. This does *not*
     assign stim, no-stim, or PS metadata since this part depends on the
     experiment.
@@ -53,23 +53,23 @@ def add_fields(word_lists=None,pairs_per_list = 6, num_lists=25,language='EN'):
         assert len(words) == pairs_per_list * 2 * num_lists
         word_lists = pd.DataFrame(words.reshape((-1, 2)), columns=['word1', 'word2'])
 
-    assert language in ['EN','SP']
-    practice_list_words = (PRACTICE_LIST_EN if language=='EN' else PRACTICE_LIST_SP).values
+    assert language in ['EN', 'SP']
+    practice_list_words = (PRACTICE_LIST_EN if language == 'EN' else PRACTICE_LIST_SP).values
     shuffle(practice_list_words)
     practice_list = pd.DataFrame(practice_list_words.reshape((-1, 2)), columns=['word1', 'word2'])
 
-    practice_list['type']='PRACTICE'
-    practice_list['listno']=0
+    practice_list['type'] = 'PRACTICE'
+    practice_list['listno'] = 0
 
-    word_lists = assign_list_numbers(word_lists,num_lists,start=1)
-    full_list = pd.concat([practice_list,word_lists],ignore_index=True)
-    cue_positions_by_list = [assign_cues(words) for _,words in full_list.groupby('listno')]
+    word_lists = assign_list_numbers(word_lists, num_lists, start=1)
+    full_list = pd.concat([practice_list, word_lists], ignore_index=True)
+    cue_positions_by_list = [assign_cues(words) for _, words in full_list.groupby('listno')]
     full_list['cue_pos'] = np.concatenate(cue_positions_by_list)
     return full_list
 
 
 def assign_cues(words):
-    cues = ['word1' if i%2 else 'word2' for i in range(len(words))]
+    cues = ['word1' if i % 2 else 'word2' for i in range(len(words))]
     shuffle(cues)
     return cues
 
@@ -87,38 +87,4 @@ def equal_pairs(a, b):
 def where_(word, wordpool):
     if wordpool.empty:
         return np.array([])
-    return (wordpool.word1==word) | (wordpool.word2==word)
-
-
-def make_unique(wordpools):
-    if len(wordpools) <= 1:
-        pass
-    else:
-        for i in range(1,len(wordpools)):
-            current_pool = wordpools[i]
-            prev_pools= wordpools[:i]
-            overlap = np.sum([equal_pairs(current_pool,p) for p in prev_pools]).astype(np.bool)
-            while overlap.any():
-                fix_common_pairs(overlap,current_pool,prev_pools)
-                overlap = np.sum([equal_pairs(current_pool, p) for p in prev_pools]).astype(np.bool)
-
-
-def fix_common_pairs(overlap, current_pool, old_pools):
-    common_pairs = current_pool.loc[overlap]
-
-
-if __name__=='__main__':
-    wordpools = generate_n_session_pairs(10)
-    for i in range(10):
-        for j in range(i):
-            pool1 = wordpools[i]
-            pool2 = wordpools[j]
-            mask = equal_pairs(pool1.loc[pool1.type != 'PRACTICE'],pool2.loc[pool2.type != 'PRACTICE'])
-
-
-
-
-
-
-
-
+    return (wordpool.word1 == word) | (wordpool.word2 == word)
