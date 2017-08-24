@@ -190,3 +190,32 @@ def generate_rec1_blocks(pool, lures):
     block_listnos = [listnos[:int(len(listnos)/2)], listnos[int(len(listnos)/2):]]
     blocks = [combined[combined.listno.isin(idx)].sample(frac=1) for idx in block_listnos]
     return pd.concat(blocks).reset_index()
+
+
+def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_name='STIM'):
+    """Generate blocks for the LEARN1 (repeated list learning) subtask.
+
+    :param pd.DataFrame pool: Input word pool.
+    :param int num_nonstim: Number of nonstim lists to include.
+    :param int num_stim: Number of stim lists to include.
+    :param str stim_name: Identifier for which stim lists to select (used for
+        multistim cases).
+    :returns: 4 blocks of lists as a :class:`pd.DataFrame`.
+
+    """
+    nonstim_listnos = random.sample(list(pool[pool.type == 'NON-STIM'].listno.unique()),
+                                    num_nonstim)
+    stim_listnos = random.sample(list(pool[pool.type == stim_name].listno.unique()),
+                                 num_stim)
+    listnos = nonstim_listnos + stim_listnos
+    lists = [pool[pool.listno == n] for n in listnos]
+
+    blocks = []
+    for blockno in range(4):
+        shuffled_words = [list_.sample(frac=1) for list_ in lists]
+        order = random.sample(range(4), 4)
+        block = pd.concat([shuffled_words[i] for i in order])
+        block['blockno'] = blockno
+        blocks.append(block)
+
+    return pd.concat(blocks).reset_index()

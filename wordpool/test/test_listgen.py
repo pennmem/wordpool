@@ -1,11 +1,12 @@
 import os
 import os.path as osp
 import shutil
-import random
 from contextlib import contextmanager
 import pytest
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+from pandas.testing import assert_frame_equal
 
 import wordpool
 from wordpool import listgen, exc
@@ -150,6 +151,23 @@ class TestFR:
 
         # this should be the original index before being reset
         assert "index" in blocks.columns
+
+    @pytest.mark.only
+    def test_generate_learn1_blocks(self):
+        session = listgen.fr.generate_session_pool()
+        pool = listgen.assign_list_types(session, 3, 6, 16)
+        blocks = listgen.generate_learn1_blocks(pool, 2, 2)
+
+        assert len(blocks.blockno.unique()) == 4
+        assert len(blocks.listno.unique()) == 4
+
+        blocks = [blocks[blocks.blockno == n].reset_index() for n in range(4)]
+        for i, block1 in enumerate(blocks):
+            for j, block2 in enumerate(blocks):
+                if i == j:
+                    continue
+                with pytest.raises(AssertionError):
+                    assert_frame_equal(block1, block2)
 
 
 class TestCatFR:
