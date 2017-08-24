@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from pkg_resources import resource_filename, resource_listdir
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 
 def list_available_pools():
