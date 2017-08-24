@@ -80,7 +80,7 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     :param int num_stim: Number of stim trials.
     :param int num_ps: Number of parameter search trials.
     :returns: pool with assigned types
-    :rtype: WordPool
+    :rtype: pd.DataFrame
 
     """
     # List numbers should already be assigned and sorted
@@ -108,7 +108,45 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
         pool.loc[pool.listno == start + n, "type"] = type_
 
     return pool
-    
+
+
+def assign_multistim(pool, stimspec):
+    """Update stim lists to account for multiple stimulation sites.
+
+    To specify the number of stim lists, use a dict such as::
+
+        stimspec = {
+            'A': 5,
+            'B': 5,
+            'A+B': 1
+        }
+
+    This indicates to use 5 stim lists for site A, 5 for site B, and 1 for
+    sites A and B. In reality, any string key is acceptable and it is up to the
+    stimulator to interpret what they mean.
+
+    :param pd.DataFrame pool: Word pool with assigned stim lists.
+    :param list names: Names of individual stim channels.
+    :param dict stimspec: Stim specifications.
+    :returns: Re-assigned word pool.
+    :rtype: pd.DataFrame
+
+    """
+    assert 'STIM' in pool['type'].unique(), "You must assign stim lists first"
+    stim_lists = list(pool[pool['type'] == 'STIM'].listno.unique())
+    assert sum(stimspec.values()) == len(stim_lists), \
+        "Incompatible number of stim lists"
+
+    for site, count in stimspec.items():
+        listnos = []
+        for _ in range(count):
+            listno = random.choice(stim_lists)
+            listnos.append(listno)
+            stim_lists.remove(listno)
+            pool.loc[pool.listno == listno, 'type'] = 'STIM_' + str(site)
+
+    return pool
+
 
 def generate_rec1_blocks(pool, lures):
     """Generate REC1 word blocks.

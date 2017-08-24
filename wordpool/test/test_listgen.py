@@ -113,6 +113,26 @@ class TestFR:
         for n in range(8, 26):
             assert session[session.listno == n]["type"].isin(["STIM", "NON-STIM"]).all()
 
+    def test_assign_multistim(self):
+        session = listgen.fr.generate_session_pool()
+        stimspec = {
+            'A': 4,
+            'B': 5,
+            'A+B': 2
+        }
+
+        with pytest.raises(AssertionError):
+            listgen.assign_multistim(session, stimspec)
+
+        session = listgen.assign_list_types(session, 3, 7, 11, 4)
+        multistim = listgen.assign_multistim(session, stimspec)
+
+        types = multistim.type.unique()
+        for key, num in stimspec.items():
+            site = 'STIM_' + key
+            assert site in types
+            assert len(multistim[multistim.type == site].listno.unique()) == num
+
     def test_generate_rec1_blocks(self):
         pool = listgen.fr.generate_session_pool()
         assigned = listgen.assign_list_types(pool, 3, 6, 16, 0)
