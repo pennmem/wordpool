@@ -115,12 +115,16 @@ class TestFR:
             assert session[session.listno == n]["type"].isin(["STIM", "NON-STIM"]).all()
 
     def test_assign_multistim(self):
-        session = listgen.fr.generate_session_pool()
+        words_per_list = 12
+        session = listgen.fr.generate_session_pool(words_per_list=words_per_list)
         stimspec = {
-            'A': 4,
-            'B': 5,
-            'A+B': 2
+            (0,): 4,
+            (1,): 5,
+            (0, 1): 2
         }
+
+        with pytest.raises(AssertionError):
+            listgen.assign_multistim(session, {1: 5})
 
         with pytest.raises(AssertionError):
             listgen.assign_multistim(session, stimspec)
@@ -128,11 +132,10 @@ class TestFR:
         session = listgen.assign_list_types(session, 3, 7, 11, 4)
         multistim = listgen.assign_multistim(session, stimspec)
 
-        types = multistim.type.unique()
+        assert 'channels' in multistim.columns
         for key, num in stimspec.items():
-            site = 'STIM_' + key
-            assert site in types
-            assert len(multistim[multistim.type == site].listno.unique()) == num
+            assert key in list(multistim.channels.unique())
+            assert len(multistim[multistim.channels == key].channels) / words_per_list == num
 
     def test_generate_rec1_blocks(self):
         pool = listgen.fr.generate_session_pool()
@@ -152,7 +155,6 @@ class TestFR:
         # this should be the original index before being reset
         assert "index" in blocks.columns
 
-    @pytest.mark.only
     def test_generate_learn1_blocks(self):
         session = listgen.fr.generate_session_pool()
         pool = listgen.assign_list_types(session, 3, 6, 16)
