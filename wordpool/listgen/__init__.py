@@ -88,6 +88,9 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     listnos = pool.listno.unique()
     assert all([n == m for n, m in zip(listnos, sorted(listnos))])
 
+    # Add stim_channels column
+    pool['stim_channels'] = None
+
     # Check that the inputs match the number of lists
     assert len(listnos) == num_baseline + num_nonstim + num_stim + num_ps + 1
 
@@ -107,6 +110,9 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     random.shuffle(stim_or_nostim)
     for n, type_ in enumerate(stim_or_nostim):
         pool.loc[pool.listno == start + n, "type"] = type_
+        if type_ == 'STIM':
+            mask = (pool.listno == start + n) & (pool.type == type_)
+            pool.loc[mask, 'stim_channels'] = pool.stim_channels.apply(lambda _: (0,))
 
     return pool
 
@@ -138,7 +144,7 @@ def assign_multistim(pool, stimspec):
     assert sum(stimspec.values()) == len(stim_lists), \
         "Incompatible number of stim lists"
 
-    pool['channels'] = None
+    pool['stim_channels'] = None
     for channels, count in stimspec.items():
         assert isinstance(channels, tuple), "stimspec keys must be tuples"
         listnos = []
@@ -146,7 +152,7 @@ def assign_multistim(pool, stimspec):
             listno = random.choice(stim_lists)
             listnos.append(listno)
             stim_lists.remove(listno)
-            pool.loc[pool.listno == listno, 'channels'] = pool.channels.apply(lambda _: channels)
+            pool.loc[pool.listno == listno, 'stim_channels'] = pool.stim_channels.apply(lambda _: channels)
 
     print(pool)
     return pool
@@ -196,20 +202,19 @@ def generate_rec1_blocks(pool, lures):
     return pd.concat(blocks).reset_index()
 
 
-def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_name='STIM'):
+def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,)):
     """Generate blocks for the LEARN1 (repeated list learning) subtask.
 
     :param pd.DataFrame pool: Input word pool.
     :param int num_nonstim: Number of nonstim lists to include.
     :param int num_stim: Number of stim lists to include.
-    :param str stim_name: Identifier for which stim lists to select (used for
-        multistim cases).
+    :param tuple stim_channels: Tuple of stim channels to draw from.
     :returns: 4 blocks of lists as a :class:`pd.DataFrame`.
 
     """
     nonstim_listnos = random.sample(list(pool[pool.type == 'NON-STIM'].listno.unique()),
                                     num_nonstim)
-    stim_listnos = random.sample(list(pool[pool.type == stim_name].listno.unique()),
+    stim_listnos = random.sample(list(pool[pool.stim_channels == stim_channels].listno.unique()),
                                  num_stim)
     listnos = nonstim_listnos + stim_listnos
     lists = [pool[pool.listno == n] for n in listnos]

@@ -94,6 +94,9 @@ class TestFR:
         session = listgen.assign_list_types(session, 3, 7, 11, 4)
         words_per_list = 12
 
+        assert 'stim_channels' in session
+        assert all(session[session.stim_channels.notnull()].stim_channels == (0,))
+
         grouped = session.groupby("type")
         counts = grouped.count()
         assert len(counts.index) == 5
@@ -132,10 +135,10 @@ class TestFR:
         session = listgen.assign_list_types(session, 3, 7, 11, 4)
         multistim = listgen.assign_multistim(session, stimspec)
 
-        assert 'channels' in multistim.columns
+        assert 'stim_channels' in multistim.columns
         for key, num in stimspec.items():
-            assert key in list(multistim.channels.unique())
-            assert len(multistim[multistim.channels == key].channels) / words_per_list == num
+            assert key in list(multistim.stim_channels.unique())
+            assert len(multistim[multistim.stim_channels == key].stim_channels) / words_per_list == num
 
     def test_generate_rec1_blocks(self):
         pool = listgen.fr.generate_session_pool()
