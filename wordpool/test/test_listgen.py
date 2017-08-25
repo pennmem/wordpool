@@ -161,8 +161,15 @@ class TestFR:
     def test_generate_learn1_blocks(self):
         session = listgen.fr.generate_session_pool()
         pool = listgen.assign_list_types(session, 3, 6, 16)
-        blocks = listgen.generate_learn1_blocks(pool, 2, 2)
+        stimspec = {
+            (0,): 5,
+            (1,): 5,
+            (0, 1): 6
+        }
+        pool = listgen.assign_multistim(pool, stimspec)
+        blocks = listgen.generate_learn1_blocks(pool, 2, 2, (0, 1))
 
+        assert (0, 1) in blocks.stim_channels.unique().tolist()
         assert len(blocks.blockno.unique()) == 4
         assert len(blocks.listno.unique()) == 4
 

@@ -154,7 +154,6 @@ def assign_multistim(pool, stimspec):
             stim_lists.remove(listno)
             pool.loc[pool.listno == listno, 'stim_channels'] = pool.stim_channels.apply(lambda _: channels)
 
-    print(pool)
     return pool
 
 
@@ -227,4 +226,5 @@ def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,)):
         block['blockno'] = blockno
         blocks.append(block)
 
-    return pd.concat(blocks).reset_index()
+    result = pd.concat(blocks).reset_index()
+    return result
