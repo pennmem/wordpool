@@ -61,6 +61,7 @@ def test_write_wordpool(tmpdir):
             assert (words == wordpool.load("REC1_lures_en.txt").word).all()
 
 
+@pytest.mark.fr
 class TestFR:
     def test_generate_session_pool(self):
         # Test basic things like types and lengths being correct
@@ -169,7 +170,10 @@ class TestFR:
         pool = listgen.assign_multistim(pool, stimspec)
         blocks = listgen.generate_learn1_blocks(pool, 2, 2, (0, 1))
 
-        assert (0, 1) in blocks.stim_channels.unique().tolist()
+        stim_channels = blocks.stim_channels.unique().tolist()
+        assert (0, 1) in stim_channels
+        assert (0,) not in stim_channels
+        assert (1,) not in stim_channels
         assert len(blocks.blockno.unique()) == 4
         assert len(blocks.listno.unique()) == 4
 
@@ -182,6 +186,7 @@ class TestFR:
                     assert_frame_equal(block1, block2)
 
 
+@pytest.mark.catfr
 class TestCatFR:
     @property
     def catpool(self):
@@ -272,6 +277,7 @@ class TestCatFR:
             assert not (first.word == second.word).all()
 
 
+@pytest.mark.pal
 class TestPAL:
     @staticmethod
     def equal_pairs(a, b):
