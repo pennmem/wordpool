@@ -159,7 +159,8 @@ class TestFR:
         # this should be the original index before being reset
         assert "index" in blocks.columns
 
-    def test_generate_learn1_blocks(self):
+    @pytest.mark.parametrize('iteration', range(5))
+    def test_generate_learn1_blocks(self, iteration):
         session = listgen.fr.generate_session_pool()
         pool = listgen.assign_list_types(session, 3, 6, 16)
         stimspec = {
