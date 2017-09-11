@@ -1,8 +1,11 @@
 """List generation and I/O."""
 
+from __future__ import print_function
+
 import random
 import os.path as osp
-import json
+import itertools
+
 import numpy.random as npr
 import pandas as pd
 
@@ -213,12 +216,13 @@ def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,)):
     """
     nonstim_listnos = random.sample(list(pool[pool.type == 'NON-STIM'].listno.unique()),
                                     num_nonstim)
-    stim_listnos = random.sample(list(pool[pasipool.stim_channels == stim_channels].listno.unique()),
+    stim_listnos = random.sample(list(pool[pool.stim_channels == stim_channels].listno.unique()),
                                  num_stim)
     listnos = nonstim_listnos + stim_listnos
     lists = [pool[pool.listno == n] for n in listnos]
 
     blocks = []
+    block_listno = itertools.count()
     for blockno in range(4):
         shuffled_words = [list_.sample(frac=1) for list_ in lists]
         order = random.sample(range(4), 4)
@@ -226,7 +230,7 @@ def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,)):
         block['blockno'] = blockno
         block['block_listno'] = -1
         for n, listno in enumerate(block.listno.unique()):
-            block.loc[block[block.listno == listno].index, 'block_listno'] = n
+            block.loc[block[block.listno == listno].index, 'block_listno'] = next(block_listno)
         blocks.append(block)
 
     result = pd.concat(blocks).reset_index()

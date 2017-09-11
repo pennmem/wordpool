@@ -179,7 +179,8 @@ class TestFR:
         assert len(blocks.listno.unique()) == 4
 
         # Verify block list numbers
-        assert len(blocks.block_listno.unique()) == 4
+        assert len(blocks.block_listno.unique()) == 16
+        assert list(blocks.block_listno.unique()) == list(range(16))
         block_listnos = []
         for blockno in range(4):
             block = blocks[blocks.blockno == blockno]
