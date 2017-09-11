@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from pkg_resources import resource_filename, resource_listdir
+from init_no_pandas import *
 
 __version__ = "0.4.1"
 
@@ -38,10 +39,8 @@ def assign_list_numbers(df, n_lists, start=0):
 
     """
     assert len(df) % n_lists == 0
-    words_per_list = int(len(df) / n_lists)
-    listnos = np.array(
-        [[n]*words_per_list for n in range(start, start + n_lists)], dtype=int).flatten()
-    df["listno"] = listnos
+    df = pd.DataFrame(assign_list_numbers_no_pandas(list(df), n_lists, start=start))
+    df.rename(columns = {1:"listno"}, inplace = True)
     return df
 
 
