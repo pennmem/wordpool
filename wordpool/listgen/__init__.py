@@ -224,6 +224,10 @@ def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,)):
         order = random.sample(range(4), 4)
         block = pd.concat([shuffled_words[i] for i in order])
         block['blockno'] = blockno
+        block['block_listno'] = -1
+        print(block.listno.unique())
+        for n, listno in enumerate(block.listno.unique()):
+            block.loc[block[block.listno == listno].index, 'block_listno'] = n
         blocks.append(block)
 
     result = pd.concat(blocks).reset_index()

@@ -178,6 +178,14 @@ class TestFR:
         assert len(blocks.blockno.unique()) == 4
         assert len(blocks.listno.unique()) == 4
 
+        # Verify block list numbers
+        assert len(blocks.block_listno.unique()) == 4
+        block_listnos = []
+        for blockno in range(4):
+            block = blocks[blocks.blockno == blockno]
+            block_listnos.append(sorted(list(block.block_listno.unique())))
+        assert [block_listnos[i] == block_listnos[i + 1] for i in range(3)]
+
         blocks = [blocks[blocks.blockno == n].reset_index() for n in range(4)]
         for i, block1 in enumerate(blocks):
             for j, block2 in enumerate(blocks):
