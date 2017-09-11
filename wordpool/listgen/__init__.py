@@ -213,7 +213,7 @@ def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,)):
     """
     nonstim_listnos = random.sample(list(pool[pool.type == 'NON-STIM'].listno.unique()),
                                     num_nonstim)
-    stim_listnos = random.sample(list(pool[pool.stim_channels == stim_channels].listno.unique()),
+    stim_listnos = random.sample(list(pool[pasipool.stim_channels == stim_channels].listno.unique()),
                                  num_stim)
     listnos = nonstim_listnos + stim_listnos
     lists = [pool[pool.listno == n] for n in listnos]
@@ -225,7 +225,6 @@ def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,)):
         block = pd.concat([shuffled_words[i] for i in order])
         block['blockno'] = blockno
         block['block_listno'] = -1
-        print(block.listno.unique())
         for n, listno in enumerate(block.listno.unique()):
             block.loc[block[block.listno == listno].index, 'block_listno'] = n
         blocks.append(block)
