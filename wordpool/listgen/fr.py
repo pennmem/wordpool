@@ -2,6 +2,7 @@
 
 import pandas as pd
 from .. import load, shuffle_words, assign_list_numbers
+from fr_no_pandas import *
 
 RAM_LIST_EN = load("ram_wordpool_en.txt")
 RAM_LIST_SP = load("ram_wordpool_sp.txt")
@@ -32,5 +33,7 @@ def generate_session_pool(words_per_list=12, num_lists=25,
 
     words = RAM_LIST_EN if language == "EN" else RAM_LIST_SP
     assert len(words) == words_per_list * num_lists
-    words = assign_list_numbers(shuffle_words(words), num_lists, start=1)
-    return pd.concat([practice, words]).reset_index(drop=True)
+    words = shuffle_words(words).reset_index(drop=True)
+    df = pd.DataFrame(concatenate_session_lists(list(practice[0]), list(words[0]), words_per_list, num_lists))
+    df.rename(columns = {1:"listno"}, inplace = True)
+    return df

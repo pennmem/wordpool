@@ -19,7 +19,6 @@ def assign_list_numbers_no_pandas(all_words, number_of_lists, start=0):
     :returns a list of (word, list_number) pairs.
 
     """
-
     if ((len(all_words))%number_of_lists != 0):
         raise ValueError("The number of words must be evenly divisible by the number of lists.")
     

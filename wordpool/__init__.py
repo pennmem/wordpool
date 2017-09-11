@@ -39,7 +39,7 @@ def assign_list_numbers(df, n_lists, start=0):
 
     """
     assert len(df) % n_lists == 0
-    df = pd.DataFrame(assign_list_numbers_no_pandas(list(df), n_lists, start=start))
+    df = pd.DataFrame(assign_list_numbers_no_pandas(list(df[0]), n_lists, start=start))
     df.rename(columns = {1:"listno"}, inplace = True)
     return df
 
