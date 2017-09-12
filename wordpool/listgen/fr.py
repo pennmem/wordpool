@@ -7,8 +7,12 @@ from fr_no_pandas import *
 RAM_LIST_EN = load("ram_wordpool_en.txt")
 RAM_LIST_SP = load("ram_wordpool_sp.txt")
 
+CAT_LIST_EN = load("ram_categorized_en.txt")
+CAT_LIST_SP = load("ram_categorized_sp.txt")
+
 PRACTICE_LIST_EN = load("practice_en.txt")
 PRACTICE_LIST_SP = load("practice_sp.txt")
+
 
 
 def generate_session_pool(words_per_list=12, num_lists=25,
@@ -24,6 +28,7 @@ def generate_session_pool(words_per_list=12, num_lists=25,
     :rtype: pd.DataFrame
 
     """
+    global RAM_LIST_EN, PRACTICE_LIST_EN
     assert language in ("EN", "SP")
 
     practice = PRACTICE_LIST_EN if language == "EN" else PRACTICE_LIST_SP

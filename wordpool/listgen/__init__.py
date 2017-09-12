@@ -11,6 +11,7 @@ from .. import exc
 from . import fr
 from . import catfr
 from . import pal
+from init_no_pandas import *
 
 RAM_LIST_EN = load("ram_wordpool_en.txt")
 RAM_LIST_SP = load("ram_wordpool_sp.txt")
@@ -88,34 +89,21 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     listnos = pool.listno.unique()
     assert all([n == m for n, m in zip(listnos, sorted(listnos))])
 
-    # Add stim_channels column
-    pool['stim_channels'] = None
-
     # Check that the inputs match the number of lists
     assert len(listnos) == num_baseline + num_nonstim + num_stim + num_ps + 1
 
-    start = listnos[1]
-    end = start + num_baseline
-    baselines = pool.listno.isin(range(start, end))
-    pool.loc[baselines, "type"] = "BASELINE"
-
-    start = end
-    end = start + num_ps
-    if start != end:
-        pses = pool.listno.isin(range(start, end))
-        pool.loc[pses, "type"] = "PS"
-        start = end
-
     stim_or_nostim = ["NON-STIM"] * num_nonstim + ["STIM"] * num_stim
     random.shuffle(stim_or_nostim)
-    for n, type_ in enumerate(stim_or_nostim):
-        pool.loc[pool.listno == start + n, "type"] = type_
-        if type_ == 'STIM':
-            mask = (pool.listno == start + n) & (pool.type == type_)
-            pool.loc[mask, 'stim_channels'] = pool.stim_channels.apply(lambda _: (0,))
+    
+    pool_list = assign_list_types_no_pandas([tuple(value) for value in pool[[0, "listno"]].values], 1, stim_or_nostim, num_ps = num_ps)
+    pool_dataframe = pool_list_to_pool_dataframe(pool_list)
+    
+    return pool_dataframe
 
-    return pool
-
+def pool_list_to_pool_dataframe(pool_list):
+    pool_dataframe = pd.DataFrame(pool_list)
+    pool_dataframe.rename(columns = {1:"listno", 2:"stim_channels", 3:"type"}, inplace = True)
+    return pool_dataframe
 
 def assign_multistim(pool, stimspec):
     """Update stim lists to account for multiple stimulation sites.

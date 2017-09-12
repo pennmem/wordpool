@@ -1,4 +1,4 @@
-from __init__ import assign_list_numbers_no_pandas
+from .. import assign_list_numbers_no_pandas
 
 def concatenate_session_lists(practice_list, word_list, words_per_list, num_lists):
     """Takes a practice list and a list of all the words for the session.  Combines them appropriately and adds list numbers.  Does not shuffle.  Shuffle beforehand please.
