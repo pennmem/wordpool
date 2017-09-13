@@ -1,4 +1,3 @@
-
 def assign_list_types_no_pandas(pool, num_baseline, stim_nonstim, num_ps=0):
     """Assign list types to a pool. The types are:
         
@@ -21,8 +20,8 @@ def assign_list_types_no_pandas(pool, num_baseline, stim_nonstim, num_ps=0):
     # Check that the inputs match the number of lists
     last_listno = pool[-1][1]
     assert last_listno == num_baseline + len(stim_nonstim) + num_ps, "The number of lists and provided type parameters didn't match"
-
-
+    
+    
     for i in range(len(pool)):
         word = pool[i]
         if (word[1] == 0):
@@ -38,42 +37,36 @@ def assign_list_types_no_pandas(pool, num_baseline, stim_nonstim, num_ps=0):
     return pool
 
 
-def assign_multistim(pool, stimspec):
+def assign_multistim_no_pandas(pool, stimspec_list):
     """Update stim lists to account for multiple stimulation sites.
         
-        To specify the number of stim lists, use a dict such as::
         
-        stimspec = {
-        (0,): 5,
-        (1,): 5,
-        (0, 1): 1
-        }
-        
-        This indicates to use 5 stim lists for site 0, 5 for site 1, and 1 for
-        sites 0 and 1. In reality, any string key is acceptable and it is up to the
-        stimulator to interpret what they mean.
-        
-        :param pd.DataFrame pool: Word pool with assigned stim lists.
+        :param list pool: Word pool with assigned stim lists. (word, listno, stim_channels, type)
         :param list names: Names of individual stim channels.
-        :param dict stimspec: Stim specifications.
-        :returns: Re-assigned word pool.
-        :rtype: pd.DataFrame
+        :rtype: list
         
         """
-    assert 'STIM' in pool['type'].unique(), "You must assign stim lists first"
-    stim_lists = list(pool[pool['type'] == 'STIM'].listno.unique())
-    assert sum(stimspec.values()) == len(stim_lists), \
-        "Incompatible number of stim lists"
+    assert len(pool) > 0, "Empty pool"
+    assert len(pool[0]) == 4, "Pool should be a list of four-tuples"
     
-    pool['stim_channels'] = None
-    for channels, count in stimspec.items():
-        assert isinstance(channels, tuple), "stimspec keys must be tuples"
-        listnos = []
-        for _ in range(count):
-            listno = random.choice(stim_lists)
-            listnos.append(listno)
-            stim_lists.remove(listno)
-            pool.loc[pool.listno == listno, 'stim_channels'] = pool.stim_channels.apply(lambda _: channels)
+    stim_words = [word for word in pool if word[3] == "STIM"]
+    unique_listnos = set()
+    for word in stim_words:
+        unique_listnos.add(word[1])
+
+    assert len(unique_listnos) == len(stimspec_list), "The number of stimspecs should be the same as the number of stim lists."
+
+    current_stimspec_index = -1
+    stim_listno = -1
+    for i in range(len(pool)):
+        word = pool[i]
+        if (word[3] == "STIM"):
+            if (word[1] != stim_listno):
+                stim_listno = word[1]
+                current_stimspec_index += 1
+            pool[i] = (word[0], word[1], stimspec_list[current_stimspec_index], word[3])
+
 
     return pool
+
 
