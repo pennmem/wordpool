@@ -25,7 +25,7 @@ def assign_list_types_no_pandas(pool, num_baseline, stim_nonstim, num_ps=0):
     for i in range(len(pool)):
         word = pool[i]
         if (word[1] == 0):
-            pool[i] = (word[0], word[1], None, float('nan'))
+            pool[i] = (word[0], word[1], None, "PRACTICE")
         elif (word[1] <= num_baseline):
             pool[i] = (word[0], word[1], None, "BASELINE")
         elif (word[1] <= num_baseline + num_ps):

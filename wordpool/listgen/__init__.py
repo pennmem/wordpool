@@ -95,14 +95,29 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     stim_or_nostim = ["NON-STIM"] * num_nonstim + ["STIM"] * num_stim
     random.shuffle(stim_or_nostim)
     
-    pool_list = assign_list_types_no_pandas([tuple(value) for value in pool[[0, "listno"]].values], 1, stim_or_nostim, num_ps = num_ps)
-    pool_dataframe = pool_list_to_pool_dataframe(pool_list)
+    
+    has_two_word_columns = False;
+    if 'word' in pool.columns:
+        pool_list = [tuple(value) for value in pool[["word", "listno"]].values]
+    elif 'word1' in pool.columns and 'word2' in pool.columns:
+        pool_list = [((value[0], value[1]), value[2]) for value in pool[["word1", "word2", "listno"]].values]
+        has_two_word_columns = True
+    else:
+        raise ValueError("The word pool must have either a word column or a word1 and word2 column")
+
+    pool_list = assign_list_types_no_pandas(pool_list, num_baseline, stim_or_nostim, num_ps = num_ps)
+    pool_dataframe = pool_list_to_pool_dataframe(pool_list, has_two_word_columns)
     
     return pool_dataframe
 
-def pool_list_to_pool_dataframe(pool_list):
+def pool_list_to_pool_dataframe(pool_list, has_two_word_columns):
     pool_dataframe = pd.DataFrame(pool_list)
-    pool_dataframe.rename(columns = {1:"listno", 2:"stim_channels", 3:"type"}, inplace = True)
+    pool_dataframe.rename(columns = {0:"word", 1:"listno", 2:"stim_channels", 3:"type"}, inplace = True)
+    if (has_two_word_columns):
+        word_pairs = pool_dataframe[0]
+        pool_dataframe.drop(0)
+        pool_dataframe['word1'] = [pair[0] for pair in word_pairs]
+        pool_dataframe['word2'] = [pair[1] for pair in word_pairs]
     return pool_dataframe
 
 def assign_multistim(pool, stimspec):
@@ -127,6 +142,7 @@ def assign_multistim(pool, stimspec):
         :rtype: pd.DataFrame
         
         """
+    assert 'type' in pool.columns, "You must assign stim lists first"
     assert 'STIM' in pool['type'].unique(), "You must assign stim lists first"
     stim_lists = list(pool[pool['type'] == 'STIM'].listno.unique())
     assert sum(stimspec.values()) == len(stim_lists), \
@@ -137,8 +153,19 @@ def assign_multistim(pool, stimspec):
         stimspec_list += [key] * value
     random.shuffle(stimspec_list)
 
-    list_pool = [tuple(x) for x in pool.to_records(index=False)]
-    return pool_list_to_pool_dataframe(assign_multistim_no_pandas(list_pool, stimspec_list))
+    has_two_word_columns = False;
+    if 'word' in pool.columns:
+        pool_list = [tuple(value) for value in pool[["word", "listno", "stim_channels", "type"]].values]
+    elif 'word1' in pool.columns and 'word2' in pool.columns:
+        pool_list = [((value[0], value[1]), value[2], value[3], value[4]) for value in pool[["word1", "word2", "listno", "stim_channels", "type"]].values]
+        has_two_word_columns = True
+    else:
+        raise ValueError("The word pool must have either a word column or a word1 and word2 column")
+
+    pool_list = assign_multistim_no_pandas(pool_list, stimspec_list)
+    pool_dataframe = pool_list_to_pool_dataframe(pool_list, has_two_word_columns)
+    
+    return pool_dataframe
 
 
 def generate_rec1_blocks(pool, lures):

@@ -39,6 +39,8 @@ def generate_session_pool(words_per_list=12, num_lists=25,
     words = RAM_LIST_EN if language == "EN" else RAM_LIST_SP
     assert len(words) == words_per_list * num_lists
     words = shuffle_words(words).reset_index(drop=True)
-    df = pd.DataFrame(concatenate_session_lists(list(practice[0]), list(words[0]), words_per_list, num_lists))
-    df.rename(columns = {1:"listno"}, inplace = True)
+    
+    pool_list = concatenate_session_lists(list(practice["word"]), list(words["word"]), words_per_list, num_lists)
+    df = pd.DataFrame(pool_list)
+    df.rename(columns = {0:"word", 1:"listno"}, inplace = True)
     return df

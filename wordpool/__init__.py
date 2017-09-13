@@ -39,8 +39,32 @@ def assign_list_numbers(df, n_lists, start=0):
 
     """
     assert len(df) % n_lists == 0
-    df = pd.DataFrame(assign_list_numbers_no_pandas(list(df[0]), n_lists, start=start))
-    df.rename(columns = {1:"listno"}, inplace = True)
+    
+    has_category = False
+    if 'category' in df.columns:
+        category_column = df['category']
+        has_category = True
+    
+    has_two_word_columns = False;
+    if 'word' in df.columns:
+        word_list = [value for value in df['word'].values]
+    elif 'word1' in df.columns and 'word2' in df.columns:
+        word_list = [(value[0], value[1]) for value in df[["word1", "word2"]].values]
+        has_two_word_columns = True
+    else:
+        raise ValueError("The word pool must have either a word column or a word1 and word2 column")
+    df = pd.DataFrame(assign_list_numbers_no_pandas(word_list, n_lists, start=start))
+
+    df.rename(columns = {0: "word", 1:"listno"}, inplace = True)
+    if (has_two_word_columns):
+        word_pairs = df['word']
+        del df['word']
+        df['word1'] = [pair[0] for pair in word_pairs]
+        df['word2'] = [pair[1] for pair in word_pairs]
+
+    if (has_category):
+        df['category'] = category_column
+
     return df
 
 
