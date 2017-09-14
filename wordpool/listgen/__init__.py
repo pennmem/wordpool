@@ -1,8 +1,11 @@
 """List generation and I/O."""
 
+from __future__ import print_function
+
 import random
 import os.path as osp
-import json
+import itertools
+
 import numpy.random as npr
 import pandas as pd
 
