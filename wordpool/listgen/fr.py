@@ -1,24 +1,17 @@
 """FR list generation."""
 
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
+import pandas as pd
+from .. import load, shuffle_words, assign_list_numbers, pool_dataframe_to_pool_list
+from ..nopandas import concatenate_session_lists
 
-try:
-    from .. import load, shuffle_words, assign_list_numbers, pool_dataframe_to_pool_list
-except ImportError:
-    load = shuffle_words = assign_list_numbers = pool_dataframe_to_pool_list
+RAM_LIST_EN = load("ram_wordpool_en.txt")
+RAM_LIST_SP = load("ram_wordpool_sp.txt")
 
-if (load):
-    RAM_LIST_EN = load("ram_wordpool_en.txt")
-    RAM_LIST_SP = load("ram_wordpool_sp.txt")
+CAT_LIST_EN = load("ram_categorized_en.txt")
+CAT_LIST_SP = load("ram_categorized_sp.txt")
 
-    CAT_LIST_EN = load("ram_categorized_en.txt")
-    CAT_LIST_SP = load("ram_categorized_sp.txt")
-
-    PRACTICE_LIST_EN = load("practice_en.txt")
-    PRACTICE_LIST_SP = load("practice_sp.txt")
+PRACTICE_LIST_EN = load("practice_en.txt")
+PRACTICE_LIST_SP = load("practice_sp.txt")
 
 def generate_session_pool(words_per_list=12, num_lists=25,
                           language="EN"):
@@ -52,16 +45,3 @@ def generate_session_pool(words_per_list=12, num_lists=25,
     df = pd.DataFrame(pool_list)
     df.rename(columns = {0:"word", 1:"listno"}, inplace = True)
     return df
-
-def concatenate_session_lists(practice_list, word_list, words_per_list, num_lists):
-    """Takes a practice list and a list of all the words for the session.  Combines them appropriately and adds list numbers.  Does not shuffle.  Shuffle beforehand please.
-        
-        :param practice_list: list of words for practice session
-        :param int num_lists: Total number of lists excluding the practice list.
-        :returns: list of (word, listno) pairs
-        """
-    
-    assert len(word_list) == words_per_list * num_lists
-    practice_list = assign_list_numbers(practice_list, 1)
-    word_list = assign_list_numbers(word_list, num_lists, start=1)
-    return practice_list + word_list
