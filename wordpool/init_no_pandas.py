@@ -1,16 +1,3 @@
-def load_no_pandas(words_filepath):
-    """Return contents of a word list as a list
-
-    :param str filename: absolute filepath to .data file containing a label line and then words each on a new line.
-
-    :rtype: list
-
-    """
-
-    with open(words_filepath) as words_file:
-        words = words_file.read().splitlines()[1:]
-    return words
-
 def assign_list_numbers_no_pandas(all_words, number_of_lists, start=0):
     """takes a list of dictionaries with just words and adds listnos.
 
