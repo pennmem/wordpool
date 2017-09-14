@@ -2,23 +2,23 @@
 
 try:
     import random
-except:
+except ImportError:
     random = None
 try:
     import os.path as osp
-except:
+except ImportError:
     osp = None
 try:
     import itertools
-except:
+except ImportError:
     itertools = None
 try:
     import numpy.random as npr
-except:
+except ImportError:
     npr = None
 try:
     import pandas as pd
-except:
+except ImportError:
     pd = None
 
 try:

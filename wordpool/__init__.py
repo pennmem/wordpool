@@ -10,7 +10,7 @@ except ImportError:
 
 try:
     from pkg_resources import resource_filename, resource_listdir
-except:
+except ImportError:
     resource_filename = None
     resource_listdir = None
 

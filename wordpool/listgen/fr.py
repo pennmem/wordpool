@@ -2,12 +2,12 @@
 
 try:
     import pandas as pd
-except:
+except ImportError:
     pd = None
 
 try:
     from .. import load, shuffle_words, assign_list_numbers, pool_dataframe_to_pool_list
-except:
+except ImportError:
     load = shuffle_words = assign_list_numbers = pool_dataframe_to_pool_list
 
 if (load):
