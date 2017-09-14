@@ -6,7 +6,7 @@ import json
 import numpy.random as npr
 import pandas as pd
 
-from .. import load
+from .. import load, pool_dataframe_to_pool_list, pool_list_to_pool_dataframe
 from .. import exc
 from . import fr
 from . import catfr
@@ -95,30 +95,11 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     stim_or_nostim = ["NON-STIM"] * num_nonstim + ["STIM"] * num_stim
     random.shuffle(stim_or_nostim)
     
+    
     pool_list = pool_dataframe_to_pool_list(pool)
     pool_list = assign_list_types_no_pandas(pool_list, num_baseline, stim_or_nostim, num_ps = num_ps)
     pool_dataframe = pool_list_to_pool_dataframe(pool_list)
     
-    return pool_dataframe
-
-def pool_dataframe_to_pool_list(pool_dataframe):
-    if 'word1' in pool_dataframe.columns and 'word2' in pool_dataframe.columns:
-        word_pairs = pool_dataframe[['word1', 'word2']].values
-        del pool_dataframe['word1']
-        del pool_dataframe['word2']
-        pool_dataframe.insert(0, 'word', [tuple(pair) for pair in word_pairs])
-    pool_list = [tuple(x) for x in pool_dataframe.to_records(index=False)]
-    return pool_list
-
-
-def pool_list_to_pool_dataframe(pool_list):
-    pool_dataframe = pd.DataFrame(pool_list)
-    pool_dataframe.rename(columns = {0:"word", 1:"listno", 2:"stim_channels", 3:"type", 4:"blockno"}, inplace = True)
-    if (len(pool_dataframe['word']) > 0) and (type(pool_dataframe['word'][0]) == tuple) and (len(pool['word'][0]) == 2):
-        word_pairs = pool_dataframe[0]
-        pool_dataframe.drop(0)
-        pool_dataframe.insert(0, 'word2', [pair[1] for pair in word_pairs])
-        pool_dataframe.insert(0, 'word1', [pair[0] for pair in word_pairs])
     return pool_dataframe
 
 def assign_multistim(pool, stimspec):
@@ -229,5 +210,5 @@ def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,1), num
     pool_list = pool_dataframe_to_pool_list(pool)
     result_list = extract_blocks(pool_list, listnos_sequence, num_blocks)
     result = pool_list_to_pool_dataframe(result_list)
-    
+
     return result

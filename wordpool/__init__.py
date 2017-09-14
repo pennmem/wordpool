@@ -40,32 +40,47 @@ def assign_list_numbers(df, n_lists, start=0):
     """
     assert len(df) % n_lists == 0
     
-    has_category = False
-    if 'category' in df.columns:
-        category_column = df['category']
-        has_category = True
-    
-    has_two_word_columns = False;
-    if 'word' in df.columns:
-        word_list = [value for value in df['word'].values]
-    elif 'word1' in df.columns and 'word2' in df.columns:
-        word_list = [(value[0], value[1]) for value in df[["word1", "word2"]].values]
-        has_two_word_columns = True
-    else:
-        raise ValueError("The word pool must have either a word column or a word1 and word2 column")
-    df = pd.DataFrame(assign_list_numbers_no_pandas(word_list, n_lists, start=start))
-
-    df.rename(columns = {0: "word", 1:"listno"}, inplace = True)
-    if (has_two_word_columns):
-        word_pairs = df['word']
-        del df['word']
-        df['word1'] = [pair[0] for pair in word_pairs]
-        df['word2'] = [pair[1] for pair in word_pairs]
-
-    if (has_category):
-        df['category'] = category_column
+    pool_list = pool_dataframe_to_pool_list(df)
+    pool_list = assign_list_numbers_no_pandas(pool_list, n_lists, start=start)
+    df = pool_list_to_pool_dataframe(pool_list)
 
     return df
+
+def pool_dataframe_to_pool_list(pool_dataframe):
+    """Covert a panda dataframe to a list of dictionaries.  For datafroms with word1 and word2 columns, make those a single tuple under the key 'word'.
+        
+    """
+    if 'word1' in pool_dataframe.columns and 'word2' in pool_dataframe.columns:
+        word_pairs = pool_dataframe[['word1', 'word2']].values
+        del pool_dataframe['word1']
+        del pool_dataframe['word2']
+        pool_dataframe.insert(0, 'word', [tuple(pair) for pair in word_pairs])
+
+    pool_list = [{} for i in range(len(pool_dataframe))]
+    for column, values in pool_dataframe.iteritems():
+        for i in range(len(values)):
+            pool_list[i][column] = values[i]
+
+    return pool_list
+
+
+def pool_list_to_pool_dataframe(pool_list):
+    """Covert a list of dictionaries to a panda dataframe.  For dictionaries with a 'word' entry that is a pair, convert that to two seperate columns called 'word1' and 'word2'
+        
+    """
+    pool_dataframe = pd.DataFrame()
+    if len(pool_list) == 0:
+        return pool_dataframe
+    
+    for key in pool_list[0].keys():
+        pool_dataframe[key] = [word[key] for word in pool_list]
+
+    if ('word' in pool_dataframe) and (type(pool_dataframe['word'][0]) == tuple) and (len(pool_dataframe['word'][0]) == 2):
+        word_pairs = pool_dataframe['word']
+        pool_dataframe['word1'] = [pair[0] for pair in word_pairs]
+        pool_dataframe['word2'] = [pair[1] for pair in word_pairs]
+
+    return pool_dataframe
 
 
 def shuffle_words(df):

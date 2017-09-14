@@ -18,21 +18,25 @@ def assign_list_types_no_pandas(pool, num_baseline, stim_nonstim, num_ps=0):
         """
     
     # Check that the inputs match the number of lists
-    last_listno = pool[-1][1]
+    last_listno = pool[-1]['listno']
     assert last_listno == num_baseline + len(stim_nonstim) + num_ps, "The number of lists and provided type parameters didn't match"
     
     
     for i in range(len(pool)):
         word = pool[i]
-        if (word[1] == 0):
-            pool[i] = (word[0], word[1], None, "PRACTICE")
-        elif (word[1] <= num_baseline):
-            pool[i] = (word[0], word[1], None, "BASELINE")
-        elif (word[1] <= num_baseline + num_ps):
-            pool[i] = (word[0], word[1], None, "PS")
+        if (word['listno'] == 0):
+            pool[i]['type'] = "PRACTICE"
+            pool[i]['stim_channels'] = None
+        elif (word['listno'] <= num_baseline):
+            pool[i]['type'] = "BASELINE"
+            pool[i]['stim_channels'] = None
+        elif (word['listno'] <= num_baseline + num_ps):
+            pool[i]['type'] = "PS"
+            pool[i]['stim_channels'] = None
         else:
-            stimtype = stim_nonstim[word[1]-num_ps-num_baseline-1]
-            pool[i] = (word[0], word[1], (0,), stimtype) if (stimtype == "STIM") else (word[0], word[1], None, stimtype)
+            stimtype = stim_nonstim[word['listno']-num_ps-num_baseline-1]
+            pool[i]['type'] = stimtype
+            pool[i]['stim_channels'] = (0,) if stimtype == "STIM" else None
 
     return pool
 
@@ -49,10 +53,10 @@ def assign_multistim_no_pandas(pool, stimspec_list):
     assert len(pool) > 0, "Empty pool"
     assert len(pool[0]) == 4, "Pool should be a list of four-tuples"
     
-    stim_words = [word for word in pool if word[3] == "STIM"]
+    stim_words = [word for word in pool if word['type'] == "STIM"]
     unique_listnos = set()
     for word in stim_words:
-        unique_listnos.add(word[1])
+        unique_listnos.add(word['listno'])
 
     assert len(unique_listnos) == len(stimspec_list), "The number of stimspecs should be the same as the number of stim lists."
 
@@ -60,11 +64,11 @@ def assign_multistim_no_pandas(pool, stimspec_list):
     stim_listno = -1
     for i in range(len(pool)):
         word = pool[i]
-        if (word[3] == "STIM"):
-            if (word[1] != stim_listno):
-                stim_listno = word[1]
+        if (word['type'] == "STIM"):
+            if (word['listno'] != stim_listno):
+                stim_listno = word['listno']
                 current_stimspec_index += 1
-            pool[i] = (word[0], word[1], stimspec_list[current_stimspec_index], word[3])
+            pool[i]['stim_channels'] = stimspec_list[current_stimspec_index]
 
 
     return pool
@@ -84,13 +88,15 @@ def extract_blocks(pool, listnos, num_blocks):
     
     wordlists = {}
     for word in pool:
-        wordlists[word[1]] = wordlists.get(word[1], []) + [word]
+        wordlists[word['listno']] = wordlists.get(word['listno'], []) + [word]
     
     blocks = []
     for i in range(len(listnos)):
         listno = listnos[i]
-        wordlist = wordlists[listno]
-        blocks += [(word[0], word[1], word[2], word[3], i/num_blocks) for word in wordlist]
-    
+        wordlist = [word.copy() for word in wordlists[listno]]
+        for word in wordlist:
+            word['blockno'] = i/num_blocks
+        blocks += wordlist
+
     return blocks
 
