@@ -70,3 +70,27 @@ def assign_multistim_no_pandas(pool, stimspec_list):
     return pool
 
 
+
+def extract_blocks(pool, listnos, num_blocks):
+    """Take out lists based on listnos and separate them into blocks
+        
+        :param list pool: Input word pool.
+        :param list listnos: The order of lists to separate into blocks
+        :param int num_blocks: The number of blocks to organize the listnos into
+        :returns: blocks of words as a list of tuples
+        
+        """
+    assert len(listnos)%num_blocks == 0, "The number of lists to append must be divisable by the number of blocks"
+    
+    wordlists = {}
+    for word in pool:
+        wordlists[word[1]] = wordlists.get(word[1], []) + [word]
+    
+    blocks = []
+    for i in range(len(listnos)):
+        listno = listnos[i]
+        wordlist = wordlists[listno]
+        blocks += [(word[0], word[1], word[2], word[3], i/num_blocks) for word in wordlist]
+    
+    return blocks
+

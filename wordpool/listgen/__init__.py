@@ -28,26 +28,26 @@ LURES_LIST_EN = load("REC1_lures_en.txt")
 def write_wordpool_txt(path, language="EN", include_lure_words=False,
                        categorized=False):
     """Write `RAM_wordpool.txt` or `CatFR_WORDS.txt` to a file (why the naming
-    is so inconsistent is beyond me). This is used in event post-processing.
-
-    :param str path: Directory to write file to.
-    :param str language: Language to use ("EN" or "SP").
-    :param bool include_lure_words: Also write lure words to ``path``.
-    :param bool categorized: When True, write the categorized word pool.
-    :returns: list of filenames written
-
-    """
+        is so inconsistent is beyond me). This is used in event post-processing.
+        
+        :param str path: Directory to write file to.
+        :param str language: Language to use ("EN" or "SP").
+        :param bool include_lure_words: Also write lure words to ``path``.
+        :param bool categorized: When True, write the categorized word pool.
+        :returns: list of filenames written
+        
+        """
     if language not in ["EN", "SP"]:
         raise exc.LanguageError("Invalid language specified")
     if language == "SP" and include_lure_words:
         raise exc.LanguageError("Spanish lure words don't exist yet")
-
+    
     kwargs = {
         "index": False,
         "header": False,
         "encoding": "utf8"
     }
-
+    
     if categorized:
         words = CAT_LIST_EN if language == "EN" else CAT_LIST_SP
         filename = osp.join(path, "CatFR_WORDS.txt")
@@ -62,7 +62,7 @@ def write_wordpool_txt(path, language="EN", include_lure_words=False,
         filename = osp.join(path, "RAM_lurepool.txt")
         lures.to_csv(filename, **kwargs)
         ret.append(filename)
-
+    
     return ret
 
 
@@ -113,12 +113,12 @@ def pool_dataframe_to_pool_list(pool_dataframe):
 
 def pool_list_to_pool_dataframe(pool_list):
     pool_dataframe = pd.DataFrame(pool_list)
-    pool_dataframe.rename(columns = {0:"word", 1:"listno", 2:"stim_channels", 3:"type"}, inplace = True)
-    if (len(pool_dataframe['word']) > 0) and (type(pool_dataframe['word'][0]) == tuple) and (len(pool_dataframe['word'][0]) == 2):
+    pool_dataframe.rename(columns = {0:"word", 1:"listno", 2:"stim_channels", 3:"type", 4:"blockno"}, inplace = True)
+    if (len(pool_dataframe['word']) > 0) and (type(pool_dataframe['word'][0]) == tuple) and (len(pool['word'][0]) == 2):
         word_pairs = pool_dataframe[0]
         pool_dataframe.drop(0)
-        pool_dataframe['word1'] = [pair[0] for pair in word_pairs]
-        pool_dataframe['word2'] = [pair[1] for pair in word_pairs]
+        pool_dataframe.insert(0, 'word2', [pair[1] for pair in word_pairs])
+        pool_dataframe.insert(0, 'word1', [pair[0] for pair in word_pairs])
     return pool_dataframe
 
 def assign_multistim(pool, stimspec):
@@ -164,38 +164,38 @@ def assign_multistim(pool, stimspec):
 
 def generate_rec1_blocks(pool, lures):
     """Generate REC1 word blocks.
-
-    :param pd.DataFrame pool: Word pool used in verbal task session.
-    :param pd.DataFrame lures: Lures to use.
-    :returns: :class:`pd.DataFrame`.
-
-    """
+        
+        :param pd.DataFrame pool: Word pool used in verbal task session.
+        :param pd.DataFrame lures: Lures to use.
+        :returns: :class:`pd.DataFrame`.
+        
+        """
     # Remove practice and baseline lists
     allowed = pool[~pool.isin(["PRACTICE", "BASELINE"])]
-
+    
     # Divide into stim lists (exclude if in last four)...
     stims = allowed[(allowed.type == "STIM") & (allowed.listno <= allowed.listno.max() - 4)]
-
+    
     # ...and nonstim lists (take all)
     nonstims = allowed[allowed.type == "NON-STIM"]
-
+    
     # Randomly select stim list numbers
     stim_idx = pd.Series(stims.listno.unique()).sample(6)
     rec_stims = stims[stims.listno.isin(stim_idx)]
     rec_nonstims = nonstims
-
+    
     # Combine selected words
     targets = pd.concat([rec_stims, rec_nonstims])
-
+    
     # Give lures list numbers
     lures["type"] = "LURE"
     lures["listno"] = npr.choice(targets.listno.unique(), len(lures))
-
+    
     # Set default category values if this is catFR
     if "category" in pool.columns:
         lures["category"] = "X"
         lures["category_num"] = -999
-
+    
     # Combine lures and targets
     combined = pd.concat([targets, lures]).sort_values(by="listno")
     listnos = combined.listno.unique()
@@ -206,30 +206,28 @@ def generate_rec1_blocks(pool, lures):
     return pd.concat(blocks).reset_index()
 
 
-def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,)):
+def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,1), num_blocks=4):
     """Generate blocks for the LEARN1 (repeated list learning) subtask.
-
-    :param pd.DataFrame pool: Input word pool.
-    :param int num_nonstim: Number of nonstim lists to include.
-    :param int num_stim: Number of stim lists to include.
-    :param tuple stim_channels: Tuple of stim channels to draw from.
-    :returns: 4 blocks of lists as a :class:`pd.DataFrame`.
-
-    """
-    nonstim_listnos = random.sample(list(pool[pool.type == 'NON-STIM'].listno.unique()),
-                                    num_nonstim)
-    stim_listnos = random.sample(list(pool[pool.stim_channels == stim_channels].listno.unique()),
-                                 num_stim)
+        
+        :param pd.DataFrame pool: Input word pool.
+        :param int num_nonstim: Number of nonstim lists to include.
+        :param int num_stim: Number of stim lists to include.
+        :param tuple stim_channels: Tuple of stim channels to draw from.
+        :returns: 4 blocks of lists as a :class:`pd.DataFrame`.
+        
+        """
+    nonstim_listnos = random.sample(list(pool[pool.type == 'NON-STIM'].listno.unique()), num_nonstim)
+    stim_listnos = random.sample(list(pool[pool.stim_channels == stim_channels].listno.unique()), num_stim)
     listnos = nonstim_listnos + stim_listnos
-    lists = [pool[pool.listno == n] for n in listnos]
-
-    blocks = []
-    for blockno in range(4):
-        shuffled_words = [list_.sample(frac=1) for list_ in lists]
-        order = random.sample(range(4), 4)
-        block = pd.concat([shuffled_words[i] for i in order])
-        block['blockno'] = blockno
-        blocks.append(block)
-
-    result = pd.concat(blocks).reset_index()
+    
+    listnos_sequence = []
+    for i in range(num_blocks):
+        block_listnos = listnos[:]
+        random.shuffle(block_listnos)
+        listnos_sequence += block_listnos
+    
+    pool_list = pool_dataframe_to_pool_list(pool)
+    result_list = extract_blocks(pool_list, listnos_sequence, num_blocks)
+    result = pool_list_to_pool_dataframe(result_list)
+    
     return result
