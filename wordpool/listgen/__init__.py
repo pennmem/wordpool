@@ -131,7 +131,7 @@ def assign_multistim(pool, stimspec):
         "Incompatible number of stim lists"
     
     stimspec_list = []
-    for key, value in stimspec.iteritems():
+    for key, value in stimspec.items():
         stimspec_list += [key] * value
     random.shuffle(stimspec_list)
     

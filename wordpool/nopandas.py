@@ -23,9 +23,9 @@ def assign_list_numbers_from_word_list(all_words, number_of_lists, start=0):
     if ((len(all_words))%number_of_lists != 0):
         raise ValueError("The number of words must be evenly divisible by the number of lists.")
     
-    length_of_each_list = len(all_words)/number_of_lists
+    length_of_each_list = len(all_words)//number_of_lists
     for i in range(len(all_words)):
-        all_words[i]['listno'] = (i/length_of_each_list) + start
+        all_words[i]['listno'] = (i//length_of_each_list) + start
     return all_words
 
 
@@ -38,7 +38,7 @@ def assign_list_types_from_type_list(pool, num_baseline, stim_nonstim, num_ps=0)
         * ``STIM``
         * ``NON-STIM``
         
-        :param pd.DataFrame pool: Input word pool.  list of (word, listno) pairs
+        :param list pool: Input word pool.  list of dictionaries with (word, listno) keys
         :param int num_baseline: Number of baseline trials *excluding* the practice
         list.
         :param list stim_nonstim: a list of "STIM" or "NON-STIM" strings indicating the order of stim and non-stim interleaved lists.
@@ -77,13 +77,12 @@ def assign_multistim_from_stim_channels_list(pool, stimspec_list):
     """Update stim lists to account for multiple stimulation sites.
         
         
-        :param list pool: Word pool with assigned stim lists. (word, listno, stim_channels, type)
-        :param list names: Names of individual stim channels.
+        :param list pool: Word pool with assigned stim lists. list items are dictionaries with these keys: word, listno, stim_channels, type)
+        :param list stimspec_list: List of stimspec tuples in the order they will appear
         :rtype: list
         
         """
     assert len(pool) > 0, "Empty pool"
-    assert len(pool[0]) == 4, "Pool should be a list of four-tuples"
     
     stim_words = [word for word in pool if word['type'] == "STIM"]
     unique_listnos = set()
@@ -126,7 +125,7 @@ def extract_blocks(pool, listnos, num_blocks):
         listno = listnos[i]
         wordlist = [word.copy() for word in wordlists[listno]]
         for word in wordlist:
-            word['blockno'] = i/num_blocks
+            word['blockno'] = i//num_blocks
             word['block_listno'] = i
         blocks += wordlist
     
