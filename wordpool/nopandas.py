@@ -1,7 +1,9 @@
 def concatenate_session_lists(practice_list, word_list, words_per_list, num_lists):
     """Takes a practice list and a list of all the words for the session.  Combines them appropriately and adds list numbers.  Does not shuffle.  Shuffle beforehand please.
         
-        :param practice_list: list of words for practice session
+        :param practice_list: list of words for practice session.  words are dictionaries {"word":"dog"}
+        :param word_list: list of words for rest of session
+        :param int words_per_list: Number of words in each list
         :param int num_lists: Total number of lists excluding the practice list.
         :returns: list of (word, listno) pairs
         """
@@ -20,6 +22,8 @@ def assign_list_numbers_from_word_list(all_words, number_of_lists, start=0):
         :returns a list of (word, list_number) pairs.
         
         """
+    if ((len(all_words) == 0) or (number_of_lists == 0)):
+        return []
     if ((len(all_words))%number_of_lists != 0):
         raise ValueError("The number of words must be evenly divisible by the number of lists.")
     
