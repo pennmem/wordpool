@@ -4,7 +4,7 @@ from .nopandas import assign_list_numbers_from_word_list
 from pkg_resources import resource_filename, resource_listdir
 
 
-__version__ = "0.4.1"
+__version__ = "0.5.dev0"
 
 
 def list_available_pools():
