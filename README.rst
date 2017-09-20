@@ -4,6 +4,9 @@ wordpool
 .. image:: https://travis-ci.org/pennmem/wordpool.svg?branch=master
     :target: https://travis-ci.org/pennmem/wordpool
 
+.. image:: https://codecov.io/gh/pennmem/wordpool/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/pennmem/wordpool
+
 Word pool generation and utilities for verbal memory experiments.
 
 
