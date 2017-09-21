@@ -77,7 +77,7 @@ class TestIntegratedNoPandasFunctions:
         stim_nostim_list = ["STIM"] * 2 + ["NON-STIM"] * 1
         #stim_nostim_list.shuffle() you would shuffle this if this weren't a test
 
-        #this will make one baseline, one ps, and 2 stim/nonstim lists
+        #this will make one baseline, one ps, and 3 stim/nonstim lists
         words_with_listtypes = nopandas.assign_list_types_from_type_list(words_with_listnos, 1, stim_nostim_list, num_ps=1)
         #this also adds stim_channels entries, None for non-stim/baseline/practice, or (0,) for stim
 
