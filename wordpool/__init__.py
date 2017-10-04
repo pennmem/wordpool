@@ -3,7 +3,6 @@ import pandas as pd
 from .nopandas import assign_list_numbers_from_word_list
 from pkg_resources import resource_filename, resource_listdir
 
-
 __version__ = "0.5.dev0"
 
 
@@ -56,8 +55,6 @@ def pool_dataframe_to_pool_list(pool_dataframe):
         word_pairs = pool_dataframe[['word1', 'word2']].values
         del pool_dataframe['word1']
         del pool_dataframe['word2']
-        if 'word' in pool_dataframe:
-            del pool_dataframe['word']
         pool_dataframe.insert(0, 'word', [tuple(pair) for pair in word_pairs])
 
     pool_list = [{} for i in range(len(pool_dataframe))]

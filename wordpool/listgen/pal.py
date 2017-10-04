@@ -58,9 +58,6 @@ def add_fields(word_lists=None, pairs_per_list = 6, num_lists=25,
     shuffle(practice_list_words)
     practice_list = pd.DataFrame(practice_list_words.reshape((-1, 2)), columns=['word1', 'word2'])
 
-    practice_list['type'] = 'PRACTICE'
-    practice_list['listno'] = 0
-
     word_lists = assign_list_numbers(word_lists, num_lists, start=1)
     full_list = pd.concat([practice_list, word_lists], ignore_index=True)
     cue_positions_by_list = [assign_cues(words) for _, words in full_list.groupby('listno')]
