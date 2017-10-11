@@ -49,7 +49,8 @@ def assign_list_numbers(df, n_lists, start=0):
 
 
 def pool_dataframe_to_pool_list(pool_dataframe):
-    """Covert a panda dataframe to a list of dictionaries.  For datafroms with word1 and word2 columns, make those a single tuple under the key 'word'.
+    """Covert a pandas dataframe to a list of dictionaries. For datafromes with
+    word1 and word2 columns, make those a single tuple under the key 'word'.
 
     """
     if 'word1' in pool_dataframe.columns and 'word2' in pool_dataframe.columns:
@@ -60,7 +61,7 @@ def pool_dataframe_to_pool_list(pool_dataframe):
             del pool_dataframe['word']
         pool_dataframe.insert(0, 'word', [tuple(pair) for pair in word_pairs])
 
-    pool_list = [{} for i in range(len(pool_dataframe))]
+    pool_list = [{} for _ in range(len(pool_dataframe))]
     for column, values in pool_dataframe.iteritems():
         for i in range(len(values)):
             pool_list[i][column] = values[i]
@@ -69,7 +70,9 @@ def pool_dataframe_to_pool_list(pool_dataframe):
 
 
 def pool_list_to_pool_dataframe(pool_list):
-    """Covert a list of dictionaries to a panda dataframe.  For dictionaries with a 'word' entry that is a pair, convert that to two seperate columns called 'word1' and 'word2'
+    """Covert a list of dictionaries to a panda dataframe. For dictionaries with
+    a 'word' entry that is a pair, convert that to two seperate columns called
+    'word1' and 'word2'
 
     """
     pool_dataframe = pd.DataFrame()

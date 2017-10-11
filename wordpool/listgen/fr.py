@@ -1,7 +1,7 @@
 """FR list generation."""
 
 import pandas as pd
-from .. import load, shuffle_words, assign_list_numbers, pool_dataframe_to_pool_list
+from .. import load, shuffle_words, pool_dataframe_to_pool_list
 from ..nopandas import concatenate_session_lists
 
 RAM_LIST_EN = load("ram_wordpool_en.txt")
@@ -12,6 +12,7 @@ CAT_LIST_SP = load("ram_categorized_sp.txt")
 
 PRACTICE_LIST_EN = load("practice_en.txt")
 PRACTICE_LIST_SP = load("practice_sp.txt")
+
 
 def generate_session_pool(words_per_list=12, num_lists=25,
                           language="EN"):
@@ -43,5 +44,5 @@ def generate_session_pool(words_per_list=12, num_lists=25,
 
     pool_list = concatenate_session_lists(practice_list, word_list, words_per_list, num_lists)
     df = pd.DataFrame(pool_list)
-    df.rename(columns = {0:"word", 1:"listno"}, inplace = True)
+    df.rename(columns={0: "word", 1: "listno"}, inplace=True)
     return df

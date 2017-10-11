@@ -2,15 +2,12 @@
 
 import random
 import os.path as osp
-import itertools
 import numpy.random as npr
 import pandas as pd
 
-
 from .. import load, pool_dataframe_to_pool_list, pool_list_to_pool_dataframe, exc
 from ..nopandas import assign_list_types_from_type_list, assign_multistim_from_stim_channels_list, extract_blocks
-from . import fr, catfr, pal
-
+from . import fr, catfr, pal  # noqa
 
 RAM_LIST_EN = load("ram_wordpool_en.txt")
 RAM_LIST_SP = load("ram_wordpool_sp.txt")
@@ -94,9 +91,8 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     stim_or_nostim = ["NON-STIM"] * num_nonstim + ["STIM"] * num_stim
     random.shuffle(stim_or_nostim)
 
-
     pool_list = pool_dataframe_to_pool_list(pool)
-    pool_list = assign_list_types_from_type_list(pool_list, num_baseline, stim_or_nostim, num_ps = num_ps)
+    pool_list = assign_list_types_from_type_list(pool_list, num_baseline, stim_or_nostim, num_ps=num_ps)
     pool_dataframe = pool_list_to_pool_dataframe(pool_list)
 
     return pool_dataframe
@@ -186,7 +182,7 @@ def generate_rec1_blocks(pool, lures):
     return pd.concat(blocks).reset_index()
 
 
-def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,1), num_blocks=4):
+def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0, 1), num_blocks=4):
     """Generate blocks for the LEARN1 (repeated list learning) subtask.
 
         :param pd.DataFrame pool: Input word pool.
