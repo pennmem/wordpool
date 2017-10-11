@@ -1,6 +1,7 @@
 numpy
 pandas
+flake8
 pytest
 pytest-cov
+pytest-flake8
 codecov
-flake8
