@@ -40,7 +40,7 @@ def assign_list_numbers(df, n_lists, start=0):
 
     """
     assert len(df) % n_lists == 0
-    
+
     pool_list = pool_dataframe_to_pool_list(df)
     pool_list = assign_list_numbers_from_word_list(pool_list, n_lists, start=start)
     df = pool_list_to_pool_dataframe(pool_list)
@@ -50,7 +50,7 @@ def assign_list_numbers(df, n_lists, start=0):
 
 def pool_dataframe_to_pool_list(pool_dataframe):
     """Covert a panda dataframe to a list of dictionaries.  For datafroms with word1 and word2 columns, make those a single tuple under the key 'word'.
-        
+
     """
     if 'word1' in pool_dataframe.columns and 'word2' in pool_dataframe.columns:
         word_pairs = pool_dataframe[['word1', 'word2']].values
@@ -70,12 +70,12 @@ def pool_dataframe_to_pool_list(pool_dataframe):
 
 def pool_list_to_pool_dataframe(pool_list):
     """Covert a list of dictionaries to a panda dataframe.  For dictionaries with a 'word' entry that is a pair, convert that to two seperate columns called 'word1' and 'word2'
-        
+
     """
     pool_dataframe = pd.DataFrame()
     if len(pool_list) == 0:
         return pool_dataframe
-    
+
     for key in pool_list[0].keys():
         pool_dataframe[key] = [word[key] for word in pool_list]
 

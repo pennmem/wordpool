@@ -28,25 +28,25 @@ def write_wordpool_txt(path, language="EN", include_lure_words=False,
                        categorized=False):
     """Write `RAM_wordpool.txt` or `CatFR_WORDS.txt` to a file (why the naming
         is so inconsistent is beyond me). This is used in event post-processing.
-        
+
         :param str path: Directory to write file to.
         :param str language: Language to use ("EN" or "SP").
         :param bool include_lure_words: Also write lure words to ``path``.
         :param bool categorized: When True, write the categorized word pool.
         :returns: list of filenames written
-        
+
         """
     if language not in ["EN", "SP"]:
         raise exc.LanguageError("Invalid language specified")
     if language == "SP" and include_lure_words:
         raise exc.LanguageError("Spanish lure words don't exist yet")
-    
+
     kwargs = {
         "index": False,
         "header": False,
         "encoding": "utf8"
     }
-    
+
     if categorized:
         words = CAT_LIST_EN if language == "EN" else CAT_LIST_SP
         filename = osp.join(path, "CatFR_WORDS.txt")
@@ -61,19 +61,19 @@ def write_wordpool_txt(path, language="EN", include_lure_words=False,
         filename = osp.join(path, "RAM_lurepool.txt")
         lures.to_csv(filename, **kwargs)
         ret.append(filename)
-    
+
     return ret
 
 
 def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     """Assign list types to a pool. The types are:
-        
+
         * ``PRACTICE``
         * ``BASELINE``
         * ``PS``
         * ``STIM``
         * ``NON-STIM``
-        
+
         :param pd.DataFrame pool: Input word pool
         :param int num_baseline: Number of baseline trials *excluding* the practice
         list.
@@ -82,100 +82,100 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
         :param int num_ps: Number of parameter search trials.
         :returns: pool with assigned types
         :rtype: pd.DataFrame
-        
+
         """
     # List numbers should already be assigned and sorted
     listnos = pool.listno.unique()
     assert all([n == m for n, m in zip(listnos, sorted(listnos))])
-    
+
     # Check that the inputs match the number of lists
     assert len(listnos) == num_baseline + num_nonstim + num_stim + num_ps + 1
-    
+
     stim_or_nostim = ["NON-STIM"] * num_nonstim + ["STIM"] * num_stim
     random.shuffle(stim_or_nostim)
-    
-    
+
+
     pool_list = pool_dataframe_to_pool_list(pool)
     pool_list = assign_list_types_from_type_list(pool_list, num_baseline, stim_or_nostim, num_ps = num_ps)
     pool_dataframe = pool_list_to_pool_dataframe(pool_list)
-    
+
     return pool_dataframe
 
 
 def assign_multistim(pool, stimspec):
     """Update stim lists to account for multiple stimulation sites.
-        
+
         To specify the number of stim lists, use a dict such as::
-        
+
         stimspec = {
         (0,): 5,
         (1,): 5,
         (0, 1): 1
         }
-        
+
         This indicates to use 5 stim lists for site 0, 5 for site 1, and 1 for
         sites 0 and 1. In reality, any string key is acceptable and it is up to the
         stimulator to interpret what they mean.
-        
+
         :param pd.DataFrame pool: Word pool with assigned stim lists.
         :param list names: Names of individual stim channels.
         :param dict stimspec: Stim specifications.
         :returns: Re-assigned word pool.
         :rtype: pd.DataFrame
-        
+
         """
     assert 'type' in pool.columns, "You must assign stim lists first"
     assert 'STIM' in pool['type'].unique(), "You must assign stim lists first"
     stim_lists = list(pool[pool['type'] == 'STIM'].listno.unique())
     assert sum(stimspec.values()) == len(stim_lists), \
         "Incompatible number of stim lists"
-    
+
     stimspec_list = []
     for key, value in stimspec.items():
         stimspec_list += [key] * value
     random.shuffle(stimspec_list)
-    
+
     pool_list = pool_dataframe_to_pool_list(pool)
     pool_list = assign_multistim_from_stim_channels_list(pool_list, stimspec_list)
     pool_dataframe = pool_list_to_pool_dataframe(pool_list)
-    
+
     return pool_dataframe
 
 
 def generate_rec1_blocks(pool, lures):
     """Generate REC1 word blocks.
-        
+
         :param pd.DataFrame pool: Word pool used in verbal task session.
         :param pd.DataFrame lures: Lures to use.
         :returns: :class:`pd.DataFrame`.
-        
+
         """
     # Remove practice and baseline lists
     allowed = pool[~pool.isin(["PRACTICE", "BASELINE"])]
-    
+
     # Divide into stim lists (exclude if in last four)...
     stims = allowed[(allowed.type == "STIM") & (allowed.listno <= allowed.listno.max() - 4)]
-    
+
     # ...and nonstim lists (take all)
     nonstims = allowed[allowed.type == "NON-STIM"]
-    
+
     # Randomly select stim list numbers
     stim_idx = pd.Series(stims.listno.unique()).sample(6)
     rec_stims = stims[stims.listno.isin(stim_idx)]
     rec_nonstims = nonstims
-    
+
     # Combine selected words
     targets = pd.concat([rec_stims, rec_nonstims])
-    
+
     # Give lures list numbers
     lures["type"] = "LURE"
     lures["listno"] = npr.choice(targets.listno.unique(), len(lures))
-    
+
     # Set default category values if this is catFR
     if "category" in pool.columns:
         lures["category"] = "X"
         lures["category_num"] = -999
-    
+
     # Combine lures and targets
     combined = pd.concat([targets, lures]).sort_values(by="listno")
     listnos = combined.listno.unique()
@@ -188,24 +188,24 @@ def generate_rec1_blocks(pool, lures):
 
 def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0,1), num_blocks=4):
     """Generate blocks for the LEARN1 (repeated list learning) subtask.
-        
+
         :param pd.DataFrame pool: Input word pool.
         :param int num_nonstim: Number of nonstim lists to include.
         :param int num_stim: Number of stim lists to include.
         :param tuple stim_channels: Tuple of stim channels to draw from.
         :returns: 4 blocks of lists as a :class:`pd.DataFrame`.
-        
+
         """
     nonstim_listnos = random.sample(list(pool[pool.type == 'NON-STIM'].listno.unique()), num_nonstim)
     stim_listnos = random.sample(list(pool[pool.stim_channels == stim_channels].listno.unique()), num_stim)
     listnos = nonstim_listnos + stim_listnos
-    
+
     listnos_sequence = []
     for i in range(num_blocks):
         block_listnos = listnos[:]
         random.shuffle(block_listnos)
         listnos_sequence += block_listnos
-    
+
     pool_list = pool_dataframe_to_pool_list(pool)
     result_list = extract_blocks(pool_list, listnos_sequence, num_blocks)
     result = pool_list_to_pool_dataframe(result_list)
