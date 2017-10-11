@@ -32,3 +32,4 @@ install:
 script:
   - python -m wordpool.test
   - codecov
+  - flake8
