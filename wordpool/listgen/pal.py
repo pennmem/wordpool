@@ -34,8 +34,7 @@ def generate_n_session_pairs(n_sessions, n_lists=25, n_pairs=6, language='EN'):
     return sess_pools
 
 
-def add_fields(word_lists=None, pairs_per_list = 6, num_lists=25,
-               language='EN'):
+def add_fields(word_lists=None, pairs_per_list=6, num_lists=25, language='EN'):
     """Generate the pool of words for a single task session. This does *not*
     assign stim, no-stim, or PS metadata since this part depends on the
     experiment.
@@ -63,7 +62,7 @@ def add_fields(word_lists=None, pairs_per_list = 6, num_lists=25,
 
     word_lists = assign_list_numbers(word_lists, num_lists, start=1)
     full_list = pd.concat([practice_list, word_lists], ignore_index=True)
-    cue_positions_by_list = [assign_cues(words) for _, words in full_list.groupby('listno')]
+    cue_positions_by_list = [assign_cues(w) for _, w in full_list.groupby('listno')]
     full_list['cue_pos'] = np.concatenate(cue_positions_by_list)
     return full_list
 
