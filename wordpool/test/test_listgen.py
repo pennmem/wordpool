@@ -331,8 +331,8 @@ class TestPAL:
         pool = listgen.pal.generate_n_session_pairs(1)[0]
 
         for _, words_by_list in pool.groupby('listno'):
-            assert (words_by_list['cue_pos']=='word1').sum()==len(words_by_list)/2
-            assert (words_by_list['cue_pos']=='word2').sum()==len(words_by_list)/2
+            assert (words_by_list['cue_pos'] == 'word1').sum() == len(words_by_list)/2
+            assert (words_by_list['cue_pos'] == 'word2').sum() == len(words_by_list)/2
 
     def test_uniqueness(self):
         wordpools = listgen.pal.generate_n_session_pairs(10)

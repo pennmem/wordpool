@@ -7,7 +7,7 @@ def concatenate_session_lists(practice_list, word_list, words_per_list, num_list
     :param word_list: list of words for rest of session
     :param int words_per_list: Number of words in each list
     :param int num_lists: Total number of lists excluding the practice list.
-    :returns: list of (word, listno) pairs
+    :returns: list of dictionaries similar to ``practice_list`` with added ``listno``
 
     """
     assert len(word_list) == words_per_list * num_lists
@@ -21,7 +21,7 @@ def assign_list_numbers_from_word_list(all_words, number_of_lists, start=0):
 
     :param all_words: a list of dictionaries of all the words to assign numbers to
     :param number_of_lists: how many lists should the words be divided into
-    :returns a list of (word, list_number) pairs.
+    :returns a list of dictionaries similar to ``all_words`` with added ``listno``
 
     """
     if len(all_words) == 0 or number_of_lists == 0:
