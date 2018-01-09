@@ -82,18 +82,18 @@ class TestIntegratedNoPandasFunctions:
         words_with_listtypes = nopandas.assign_list_types_from_type_list(words_with_listnos, 1, stim_nostim_list, num_ps=1)
         #this also adds stim_channels entries, None for non-stim/baseline/practice, or (0,) for stim
 
-        assert words_with_listnos == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
-                                      {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
-                                      {"word": "five", "listno": 1, "type":"BASELINE", "stim_channels": None},
-                                      {"word": "six", "listno": 1, "type":"BASELINE", "stim_channels": None},
-                                      {"word": "seven", "listno": 2, "type":"PS", "stim_channels": None},
-                                      {"word": "eight", "listno": 2, "type":"PS", "stim_channels": None},
-                                      {"word": "nine", "listno": 3, "type":"STIM", "stim_channels": (0, )},
-                                      {"word": "ten", "listno": 3, "type":"STIM", "stim_channels": (0, )},
-                                      {"word": "eleven", "listno": 4, "type":"STIM", "stim_channels": (0, )},
-                                      {"word": "twelve", "listno": 4, "type":"STIM", "stim_channels": (0, )},
-                                      {"word": "thirteen", "listno": 5, "type":"NON-STIM", "stim_channels": None},
-                                      {"word": "fourteen", "listno": 5, "type":"NON-STIM", "stim_channels": None}]
+        assert words_with_listtypes == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+                                        {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+                                        {"word": "five", "listno": 1, "type":"BASELINE", "stim_channels": None},
+                                        {"word": "six", "listno": 1, "type":"BASELINE", "stim_channels": None},
+                                        {"word": "seven", "listno": 2, "type":"PS", "stim_channels": None},
+                                        {"word": "eight", "listno": 2, "type":"PS", "stim_channels": None},
+                                        {"word": "nine", "listno": 3, "type":"STIM", "stim_channels": (0, )},
+                                        {"word": "ten", "listno": 3, "type":"STIM", "stim_channels": (0, )},
+                                        {"word": "eleven", "listno": 4, "type":"STIM", "stim_channels": (0, )},
+                                        {"word": "twelve", "listno": 4, "type":"STIM", "stim_channels": (0, )},
+                                        {"word": "thirteen", "listno": 5, "type":"NON-STIM", "stim_channels": None},
+                                        {"word": "fourteen", "listno": 5, "type":"NON-STIM", "stim_channels": None}]
 
         #third step is to assign stim channels beyond simply (0, ) each time.  pass in a list of channels, and
         #they will be distributed in order to each of the stim lists
@@ -101,18 +101,18 @@ class TestIntegratedNoPandasFunctions:
 
         words_with_multistim = nopandas.assign_multistim_from_stim_channels_list(words_with_listtypes, stim_channels_list)
 
-        assert words_with_listnos == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
-                                      {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
-                                      {"word": "five", "listno": 1, "type":"BASELINE", "stim_channels": None},
-                                      {"word": "six", "listno": 1, "type":"BASELINE", "stim_channels": None},
-                                      {"word": "seven", "listno": 2, "type":"PS", "stim_channels": None},
-                                      {"word": "eight", "listno": 2, "type":"PS", "stim_channels": None},
-                                      {"word": "nine", "listno": 3, "type":"STIM", "stim_channels": (0, 1)},
-                                      {"word": "ten", "listno": 3, "type":"STIM", "stim_channels": (0, 1)},
-                                      {"word": "eleven", "listno": 4, "type":"STIM", "stim_channels": (0, )},
-                                      {"word": "twelve", "listno": 4, "type":"STIM", "stim_channels": (0, )},
-                                      {"word": "thirteen", "listno": 5, "type":"NON-STIM", "stim_channels": None},
-                                      {"word": "fourteen", "listno": 5, "type":"NON-STIM", "stim_channels": None}]
+        assert words_with_multistim == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+                                        {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+                                        {"word": "five", "listno": 1, "type":"BASELINE", "stim_channels": None},
+                                        {"word": "six", "listno": 1, "type":"BASELINE", "stim_channels": None},
+                                        {"word": "seven", "listno": 2, "type":"PS", "stim_channels": None},
+                                        {"word": "eight", "listno": 2, "type":"PS", "stim_channels": None},
+                                        {"word": "nine", "listno": 3, "type":"STIM", "stim_channels": (0, 1)},
+                                        {"word": "ten", "listno": 3, "type":"STIM", "stim_channels": (0, 1)},
+                                        {"word": "eleven", "listno": 4, "type":"STIM", "stim_channels": (0, )},
+                                        {"word": "twelve", "listno": 4, "type":"STIM", "stim_channels": (0, )},
+                                        {"word": "thirteen", "listno": 5, "type":"NON-STIM", "stim_channels": None},
+                                        {"word": "fourteen", "listno": 5, "type":"NON-STIM", "stim_channels": None}]
 
         #finally, extract the learning blocks and append them to the main lists.  extract_blocks takes a list of
         #the blocks you want to repeat, and a number of blocks to divide them into.  fr6 calls for four blocks of
@@ -158,3 +158,31 @@ class TestIntegratedNoPandasFunctions:
                                               {"word": "fourteen", "listno": 5, "type":"NON-STIM", "stim_channels": None, "blockno": 2, "block_listno": 7},
                                               {"word": "nine", "listno": 3, "type":"STIM", "stim_channels": (0, 1), "blockno": 2, "block_listno": 8},
                                               {"word": "ten", "listno": 3, "type":"STIM", "stim_channels": (0, 1), "blockno": 2, "block_listno": 8}]
+
+    def test_amplitude_index_assignmnt(self):
+        practice_list = a_couple_words()
+        main_list = a_couple_more_words() + ten_words()
+
+        pool = words_with_listnos = nopandas.concatenate_session_lists (practice_list, main_list, 2, 6)
+
+        stim_nostim_list = ["STIM"] * 6
+        words_with_listtypes = nopandas.assign_list_types_from_type_list(pool, 0, stim_nostim_list)
+
+        amplitude_index_list = [1, 2, 3, 1, 3, 2]
+        words_with_amplitude_index = nopandas.assign_amplitudes_from_amplitude_index_list(words_with_listtypes, amplitude_index_list)
+        assert words_with_amplitude_index == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+                                             {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+                                             {"word": "three", "listno": 1, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 1},
+                                             {"word": "four", "listno": 1, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 1},
+                                             {"word": "five", "listno": 2, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 2},
+                                             {"word": "six", "listno": 2, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 2},
+                                             {"word": "seven", "listno": 3, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 3},
+                                             {"word": "eight", "listno": 3, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 3},
+                                             {"word": "nine", "listno": 4, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 1},
+                                             {"word": "ten", "listno": 4, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 1},
+                                             {"word": "eleven", "listno": 5, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 3},
+                                             {"word": "twelve", "listno": 5, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 3},
+                                             {"word": "thirteen", "listno": 6, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 2},
+                                             {"word": "fourteen", "listno": 6, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 2}]
+
+
