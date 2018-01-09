@@ -80,9 +80,26 @@ def assign_list_types_from_type_list(pool, num_baseline, stim_nonstim, num_ps=0)
 
 def assign_multistim_from_stim_channels_list(pool, stimspec_list):
     """Update stim lists to account for multiple stimulation sites.
-
     :param list pool: Word pool with assigned stim lists. list items are dictionaries with these keys: word, listno, stim_channels, type)
     :param list stimspec_list: List of stimspec tuples in the order they will appear
+    :rtype: list
+    """
+    return _assign_stim_attribute_from_stim_attribute_list(pool, stimspec_list, 'stim_channels')
+
+def assign_amplitudes_from_amplitude_index_list(pool, amplitude_index_list):
+    """Update stim lists to account for varying stimulation amplitudes.
+    :param list pool: Word pool with assigned stim lists. list items are dictionaries with these keys: word, listno, stim_channels, type)
+    :param list amplitude_index_list: List of amplitude indeces (0, 1, or 2) in the order they will appear
+    :rtype: list
+    """
+    return _assign_stim_attribute_from_stim_attribute_list(pool, amplitude_index_list, 'amplitude_index')
+    
+def _assign_stim_attribute_from_stim_attribute_list(pool, attribute_list, attribute_name):
+    """Update stim lists to account for a new attribute.
+
+    :param list pool: Word pool with assigned stim lists. list items are dictionaries with these keys: word, listno, stim_channels, type)
+    :param list attribute_list: List of tuples of the new attribute in the order they will appear
+    :param list attribute_name: name of the new attribute
     :rtype: list
 
     """
@@ -93,20 +110,19 @@ def assign_multistim_from_stim_channels_list(pool, stimspec_list):
     for word in stim_words:
         unique_listnos.add(word['listno'])
 
-    assert len(unique_listnos) == len(stimspec_list), "The number of stimspecs should be the same as the number of stim lists."
+    assert len(unique_listnos) == len(attribute_list), "The number of attributes should be the same as the number of stim lists."
 
-    current_stimspec_index = -1
+    current_attribute_index = -1
     stim_listno = -1
     for i in range(len(pool)):
         word = pool[i]
         if (word['type'] == "STIM"):
             if (word['listno'] != stim_listno):
                 stim_listno = word['listno']
-                current_stimspec_index += 1
-            pool[i]['stim_channels'] = stimspec_list[current_stimspec_index]
+                current_attribute_index += 1
+            pool[i][attribute_name] = attribute_list[current_stimspec_attribute]
 
     return pool
-
 
 def extract_blocks(pool, listnos, num_blocks):
     """Take out lists based on listnos and separate them into blocks
