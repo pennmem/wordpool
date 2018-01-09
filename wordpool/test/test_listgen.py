@@ -317,6 +317,9 @@ class TestPAL:
 
         assert len(pool)*2 == np.unique(pool[['word1', 'word2']].values).size
 
+        for list_type in pool['type']:
+            assert type(list_type) == str
+
         for _, list_pairs in pool.groupby('listno'):
             assert len(list_pairs) == 6
 
