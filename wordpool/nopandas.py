@@ -1,21 +1,3 @@
-def concatenate_session_lists(practice_list, word_list, words_per_list, num_lists):
-    """Takes a practice list and a list of all the words for the session.
-    Combines them appropriately and adds list numbers.  Does not shuffle.
-    Shuffle beforehand please.
-
-    :param practice_list: list of words for practice session.  words are dictionaries {"word":"dog"}
-    :param word_list: list of words for rest of session
-    :param int words_per_list: Number of words in each list
-    :param int num_lists: Total number of lists excluding the practice list.
-    :returns: list of dictionaries similar to ``practice_list`` with added ``listno``
-
-    """
-    assert len(word_list) == words_per_list * num_lists
-    practice_list = assign_list_numbers_from_word_list(practice_list, 1)
-    word_list = assign_list_numbers_from_word_list(word_list, num_lists, start=1)
-    return practice_list + word_list
-
-
 def assign_list_numbers_from_word_list(all_words, number_of_lists, start=0):
     """takes a list of dictionaries with just words and adds listnos.
 
@@ -38,14 +20,13 @@ def assign_list_numbers_from_word_list(all_words, number_of_lists, start=0):
 def assign_list_types_from_type_list(pool, num_baseline, stim_nonstim, num_ps=0):
     """Assign list types to a pool. The types are:
 
-        * ``PRACTICE``
         * ``BASELINE``
         * ``PS``
         * ``STIM``
         * ``NON-STIM``
 
         :param list pool: Input word pool.  list of dictionaries with (word, listno) keys
-        :param int num_baseline: Number of baseline trials *excluding* the practice
+        :param int num_baseline: Number of baseline trials
         list.
         :param list stim_nonstim:
             a list of "STIM" or "NON-STIM" strings indicating the order of stim and non-stim interleaved lists.
@@ -61,13 +42,10 @@ def assign_list_types_from_type_list(pool, num_baseline, stim_nonstim, num_ps=0)
 
     for i in range(len(pool)):
         word = pool[i]
-        if word['listno'] == 0:
-            pool[i]['type'] = "PRACTICE"
-            pool[i]['stim_channels'] = None
-        elif word['listno'] <= num_baseline:
+        if word['listno'] < num_baseline:
             pool[i]['type'] = "BASELINE"
             pool[i]['stim_channels'] = None
-        elif word['listno'] <= num_baseline + num_ps:
+        elif word['listno'] < num_baseline + num_ps:
             pool[i]['type'] = "PS"
             pool[i]['stim_channels'] = None
         else:
