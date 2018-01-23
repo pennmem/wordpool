@@ -65,14 +65,13 @@ def write_wordpool_txt(path, language="EN", include_lure_words=False,
 def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     """Assign list types to a pool. The types are:
 
-        * ``PRACTICE``
         * ``BASELINE``
         * ``PS``
         * ``STIM``
         * ``NON-STIM``
 
         :param pd.DataFrame pool: Input word pool
-        :param int num_baseline: Number of baseline trials *excluding* the practice
+        :param int num_baseline: Number of baseline trials
         list.
         :param int num_nonstim: Number of non-stim trials.
         :param int num_stim: Number of stim trials.
@@ -86,7 +85,7 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     assert all([n == m for n, m in zip(listnos, sorted(listnos))])
 
     # Check that the inputs match the number of lists
-    assert len(listnos) == num_baseline + num_nonstim + num_stim + num_ps + 1
+    assert len(listnos) == num_baseline + num_nonstim + num_stim + num_ps
 
     stim_or_nostim = ["NON-STIM"] * num_nonstim + ["STIM"] * num_stim
     random.shuffle(stim_or_nostim)
