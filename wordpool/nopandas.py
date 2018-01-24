@@ -8,8 +8,7 @@ def assign_list_numbers_from_word_list(all_words, number_of_lists, start=0):
     """
     if len(all_words) == 0 or number_of_lists == 0:
         return []
-    if len(all_words) % number_of_lists != 0:
-        raise ValueError("The number of words must be evenly divisible by the number of lists.")
+    assert len(all_words) % number_of_lists == 0, "The number of words must be evenly divisible by the number of lists. " + str(len(all_words)) + " isn't divisble by " + str(number_of_lists)
 
     length_of_each_list = len(all_words)//number_of_lists
     for i in range(len(all_words)):
@@ -38,7 +37,8 @@ def assign_list_types_from_type_list(pool, num_baseline, stim_nonstim, num_ps=0)
 
     # Check that the inputs match the number of lists
     last_listno = pool[-1]['listno']
-    assert last_listno == num_baseline + len(stim_nonstim) + num_ps, "The number of lists and provided type parameters didn't match"
+    parameters_list_count = num_baseline + len(stim_nonstim) + num_ps
+    assert last_listno+1 == parameters_list_count, "I think there should be " + str(parameters_list_count) + " lists but I see " + str(last_listno+1) + "." 
 
     for i in range(len(pool)):
         word = pool[i]
@@ -49,7 +49,7 @@ def assign_list_types_from_type_list(pool, num_baseline, stim_nonstim, num_ps=0)
             pool[i]['type'] = "PS"
             pool[i]['stim_channels'] = None
         else:
-            stimtype = stim_nonstim[word['listno']-num_ps-num_baseline-1]
+            stimtype = stim_nonstim[word['listno']-num_ps-num_baseline]
             pool[i]['type'] = stimtype
             pool[i]['stim_channels'] = (0,) if stimtype == "STIM" else None
 

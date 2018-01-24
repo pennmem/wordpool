@@ -17,7 +17,8 @@ def assign_word_numbers(pool):
 
     word_count = pool.groupby("category").count().word
     n_words = word_count[0]
-    assert all([n_words == word_count[n] for n in range(1, len(word_count))])
+    for i in range(1, len(word_count)):
+        assert n_words == word_count[i], "The category " + str(i) + " appears not to have " + str (n_words) + " words. It has " + str(word_count[i]) + "."
 
     # Assign word and category numbers
     pool["category_num"] = -999
@@ -28,7 +29,7 @@ def assign_word_numbers(pool):
     return pool
 
 
-def assign_list_numbers(pool, n_lists=26, list_start=1):
+def assign_list_numbers(pool, n_lists=26, list_start=0):
     """Assign list numbers to words in the pool."""
     assert "wordno" in pool.columns
     pool["listno"] = -1
@@ -115,12 +116,4 @@ def generate_session_pool(language="EN"):
     pool = shuffle_within_groups(load(filename), "category")
     words = sort_pairs(assign_list_numbers(assign_word_numbers(pool)))
 
-    all_words = load('practice_cat_{:s}.txt'.format(language.lower()))
-    all_words['listno'] = 0
-    all_words['type'] = "PRACTICE"
-    all_words['wordno'] = range(12)
-    all_words['category'] = "X"
-    all_words['category_num'] = -999
-    all_words = shuffle_words(all_words)
-
-    return all_words.append(words).reset_index(drop=True)
+    return words

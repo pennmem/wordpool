@@ -15,7 +15,7 @@ PRACTICE_LIST_EN = load("practice_en.txt")
 PRACTICE_LIST_SP = load("practice_sp.txt")
 
 
-def generate_n_session_pairs(n_sessions, n_lists=25, n_pairs=6, language='EN'):
+def generate_n_session_pairs(n_sessions, n_lists=26, n_pairs=6, language='EN'):
     words = wordpools[language].values
     n_words = len(words)
     assert n_lists*n_pairs*2 == n_words
@@ -34,7 +34,7 @@ def generate_n_session_pairs(n_sessions, n_lists=25, n_pairs=6, language='EN'):
     return sess_pools
 
 
-def add_fields(word_lists=None, pairs_per_list=6, num_lists=25, language='EN'):
+def add_fields(word_lists=None, pairs_per_list=6, num_lists=26, language='EN'):
     """Generate the pool of words for a single task session. This does *not*
     assign stim, no-stim, or PS metadata since this part depends on the
     experiment.

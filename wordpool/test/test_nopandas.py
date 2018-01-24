@@ -20,20 +20,17 @@ def ten_words():
 @pytest.mark.nopandas
 class TestConcatenateSessionLists:
     def test_raises_list_length_error(self):
-        practice_list = a_couple_words()
-        word_list =  a_couple_more_words()
-        for list_lengths in [(0, 0), (99, 0), (0, 99), (99, 99)]:
-            with pytest.raises(AssertionError):
-                nopandas.concatenate_session_lists(practice_list, word_list, list_lengths[0], list_lengths[1])
+        four_words = a_couple_words() + a_couple_more_words()
+        with pytest.raises(AssertionError):
+            nopandas.assign_list_numbers_from_word_list(four_words, 3, 3)
 
     def test_assigns_listnos(self):
-        practice_list = a_couple_words()
-        word_list =  a_couple_more_words()
-        result = nopandas.concatenate_session_lists(practice_list, word_list, 2, 1)
+        four_words = a_couple_words() + a_couple_more_words()
+        result = nopandas.assign_list_numbers_from_word_list(four_words, 2)
         assert result == [{"word": "one", "listno": 0}, {"word": "two", "listno": 0}, {"word": "three", "listno": 1}, {"word": "four", "listno": 1}]
 
     def test_empty_inputs(self):
-        result = nopandas.concatenate_session_lists({}, {}, 0, 0)
+        result = nopandas.assign_list_numbers_from_word_list({}, 0)
         assert result == []
 
 @pytest.mark.nopandas
@@ -43,19 +40,17 @@ class TestIntegratedNoPandasFunctions:
         #here is an example of how to create an fr6 wordpool, which uses all the nopandas functions
         
         #first, load lists of dictionaries with 'word' keys and values containing the word, such as 'dog'
-        practice_list = a_couple_words()
-        main_list = ten_words()
+        word_list = a_couple_words() + ten_words()
         
         #shuffling is not performed in no pandas functions.  to meet the fr6 requirements, shuffle lists before
         #passing them to nopandas functions. likes this:
-        #practice_list.shuffle()
         #word_list.shuffle()
         #lists are not shuffled here in order to facilitate testing
         
         #this will take a list of dictionaries for the practice list, and another for the rest of the lists
         #it will concatenate them into one list of dictionaries with list numbers assigned under the key 'listno'
         #list numbers start from 0
-        words_with_listnos = nopandas.concatenate_session_lists (practice_list, main_list, 2, 5)
+        words_with_listnos = nopandas.assign_list_numbers_from_word_list(word_list, 6)
         #two is the number of words per list, and 5 is the number of lists, which excludes the practice list
 
         assert words_with_listnos == [{"word": "one", "listno": 0},
@@ -79,11 +74,11 @@ class TestIntegratedNoPandasFunctions:
 
         #this will make one baseline, one ps, and 3 stim/nonstim lists.
         #FR6 has 3 baseline, 0 ps, and 22 stim/nonstim.
-        words_with_listtypes = nopandas.assign_list_types_from_type_list(words_with_listnos, 1, stim_nostim_list, num_ps=1)
+        words_with_listtypes = nopandas.assign_list_types_from_type_list(words_with_listnos, 2, stim_nostim_list, num_ps=1)
         #this also adds stim_channels entries, None for non-stim/baseline/practice, or (0,) for stim
 
-        assert words_with_listtypes == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
-                                        {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+        assert words_with_listtypes == [{"word": "one", "listno": 0, "type":"BASELINE", "stim_channels": None},
+                                        {"word": "two", "listno": 0, "type":"BASELINE", "stim_channels": None},
                                         {"word": "five", "listno": 1, "type":"BASELINE", "stim_channels": None},
                                         {"word": "six", "listno": 1, "type":"BASELINE", "stim_channels": None},
                                         {"word": "seven", "listno": 2, "type":"PS", "stim_channels": None},
@@ -101,8 +96,8 @@ class TestIntegratedNoPandasFunctions:
 
         words_with_multistim = nopandas.assign_multistim_from_stim_channels_list(words_with_listtypes, stim_channels_list)
 
-        assert words_with_multistim == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
-                                        {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+        assert words_with_multistim == [{"word": "one", "listno": 0, "type":"BASELINE", "stim_channels": None},
+                                        {"word": "two", "listno": 0, "type":"BASELINE", "stim_channels": None},
                                         {"word": "five", "listno": 1, "type":"BASELINE", "stim_channels": None},
                                         {"word": "six", "listno": 1, "type":"BASELINE", "stim_channels": None},
                                         {"word": "seven", "listno": 2, "type":"PS", "stim_channels": None},
@@ -128,8 +123,8 @@ class TestIntegratedNoPandasFunctions:
         #because they are repeated three times, this means they are divided into three blocks.  that is the
         #meaning of the 3 parameter.
 
-        assert words_with_learning_blocks == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
-                                              {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+        assert words_with_learning_blocks == [{"word": "one", "listno": 0, "type":"BASELINE", "stim_channels": None},
+                                              {"word": "two", "listno": 0, "type":"BASELINE", "stim_channels": None},
                                               {"word": "five", "listno": 1, "type":"BASELINE", "stim_channels": None},
                                               {"word": "six", "listno": 1, "type":"BASELINE", "stim_channels": None},
                                               {"word": "seven", "listno": 2, "type":"PS", "stim_channels": None},
@@ -160,18 +155,17 @@ class TestIntegratedNoPandasFunctions:
                                               {"word": "ten", "listno": 3, "type":"STIM", "stim_channels": (0, 1), "blockno": 2, "block_listno": 8}]
 
     def test_amplitude_index_assignmnt(self):
-        practice_list = a_couple_words()
-        main_list = a_couple_more_words() + ten_words()
+        word_list = a_couple_words() + a_couple_more_words() + ten_words()
 
-        pool = words_with_listnos = nopandas.concatenate_session_lists (practice_list, main_list, 2, 6)
+        pool = words_with_listnos = nopandas.assign_list_numbers_from_word_list(word_list, 7)
 
-        stim_nostim_list = ["STIM"] * 6
+        stim_nostim_list = ["NON-STIM"] + ["STIM"] * 6
         words_with_listtypes = nopandas.assign_list_types_from_type_list(pool, 0, stim_nostim_list)
 
         amplitude_index_list = [1, 2, 3, 1, 3, 2]
         words_with_amplitude_index = nopandas.assign_amplitudes_from_amplitude_index_list(words_with_listtypes, amplitude_index_list)
-        assert words_with_amplitude_index == [{"word": "one", "listno": 0, "type":"PRACTICE", "stim_channels": None},
-                                             {"word": "two", "listno": 0, "type":"PRACTICE", "stim_channels": None},
+        assert words_with_amplitude_index == [{"word": "one", "listno": 0, "type":"NON-STIM", "stim_channels": None},
+                                             {"word": "two", "listno": 0, "type":"NON-STIM", "stim_channels": None},
                                              {"word": "three", "listno": 1, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 1},
                                              {"word": "four", "listno": 1, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 1},
                                              {"word": "five", "listno": 2, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 2},
@@ -184,5 +178,3 @@ class TestIntegratedNoPandasFunctions:
                                              {"word": "twelve", "listno": 5, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 3},
                                              {"word": "thirteen", "listno": 6, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 2},
                                              {"word": "fourteen", "listno": 6, "type":"STIM", "stim_channels": (0, ), "amplitude_index": 2}]
-
-

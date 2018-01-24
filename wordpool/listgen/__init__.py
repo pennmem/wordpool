@@ -85,7 +85,9 @@ def assign_list_types(pool, num_baseline, num_nonstim, num_stim, num_ps=0):
     assert all([n == m for n, m in zip(listnos, sorted(listnos))])
 
     # Check that the inputs match the number of lists
-    assert len(listnos) == num_baseline + num_nonstim + num_stim + num_ps
+
+    parameters_lists = num_baseline + num_nonstim + num_stim + num_ps
+    assert len(listnos) == parameters_lists, "Parameters call for " + str(parameters_lists) + " lists, but I see " + str(len(listnos)) + " list numbers."
 
     stim_or_nostim = ["NON-STIM"] * num_nonstim + ["STIM"] * num_stim
     random.shuffle(stim_or_nostim)

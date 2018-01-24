@@ -1,4 +1,16 @@
 category	word
+Bears	BROWN
+Bears	BLUE
+Bears	BLACK
+Bears	POLAR
+Bears	PANDA
+Bears	BEETS
+Bears	BIRDS
+Bears	BATTLESTARGALLACTICA
+Bears	CHICAGO
+Bears	SCARY
+Bears	BIG
+Bears	POOH
 Appliances	REFRIGERADOR
 Appliances	LAVADORA
 Appliances	ESTUFA

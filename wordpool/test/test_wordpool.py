@@ -40,23 +40,23 @@ def test_create(pool, catpool):
 
 def test_assign_list_numbers(catpool):
     df = catpool.copy()
-    assigned = wordpool.assign_list_numbers(catpool, 25)
+    assigned = wordpool.assign_list_numbers(catpool, 26)
     assert "listno" in assigned.columns
     assert "word" in assigned.columns
     assert "category" in assigned.columns
-    assert all(list(range(25)) == assigned.listno.unique())
+    assert all(list(range(26)) == assigned.listno.unique())
     assert all(df.word == assigned.word)
     assert all(df.category == assigned.category)
 
     # type and start, stop
     assert assigned.listno.dtype == int
     assert assigned.listno.iloc[0] == 0
-    assert assigned.listno.iloc[-1] == 24
+    assert assigned.listno.iloc[-1] == 25
 
     # specify non-default start index
-    assigned = wordpool.assign_list_numbers(catpool, 25, 1)
+    assigned = wordpool.assign_list_numbers(catpool, 26, 1)
     assert assigned.listno.iloc[0] == 1
-    assert assigned.listno.iloc[-1] == 25
+    assert assigned.listno.iloc[-1] == 26
 
 
 def test_shuffle_words(pool, catpool):
@@ -95,8 +95,8 @@ def test_shuffle_within_lists(pool, catpool):
     with pytest.raises(RuntimeError):
         catwords = wordpool.shuffle_within_lists(catdf)
 
-    df = wordpool.assign_list_numbers(df, 25)
-    catdf = wordpool.assign_list_numbers(catdf, 25)
+    df = wordpool.assign_list_numbers(df, 26)
+    catdf = wordpool.assign_list_numbers(catdf, 26)
     words = wordpool.shuffle_within_lists(df)
     catwords = wordpool.shuffle_within_lists(catdf)
 

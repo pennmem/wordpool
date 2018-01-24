@@ -68,7 +68,7 @@ class TestFR:
         for language in "EN", "SP":
             session = listgen.fr.generate_session_pool(language=language)
             assert type(session) is pd.DataFrame
-            assert len(session.word) == 26*12
+            # assert len(session.word) == 26*12 # number of words depends on the contents of the wordpool file
 
             for listno in session.listno.unique():
                 df = session[session.listno == listno]
@@ -76,7 +76,7 @@ class TestFR:
                 assert len(df) is 12
 
         with pytest.raises(AssertionError):
-            listgen.fr.generate_session_pool(13)
+            listgen.fr.generate_session_pool(7)
         with pytest.raises(AssertionError):
             listgen.fr.generate_session_pool(num_lists=27)
         with pytest.raises(AssertionError):
@@ -92,7 +92,7 @@ class TestFR:
 
     def test_assign_list_types(self):
         session = listgen.fr.generate_session_pool()
-        session = listgen.assign_list_types(session, 3, 7, 11, 4)
+        session = listgen.assign_list_types(session, 4, 7, 11, 4)
         words_per_list = 12
 
         assert 'stim_channels' in session
@@ -100,9 +100,8 @@ class TestFR:
 
         grouped = session.groupby("type")
         counts = grouped.count()
-        assert len(counts.index) == 5
-        assert counts.loc["PRACTICE"].listno / words_per_list == 1
-        assert counts.loc["BASELINE"].listno / words_per_list == 3
+        assert len(counts.index) == 4
+        assert counts.loc["BASELINE"].listno / words_per_list == 4
         assert counts.loc["NON-STIM"].listno / words_per_list == 7
         assert counts.loc["STIM"].listno / words_per_list == 11
         assert counts.loc["PS"].listno / words_per_list == 4
@@ -120,7 +119,7 @@ class TestFR:
 
     def test_assign_multistim(self):
         words_per_list = 12
-        session = listgen.fr.generate_session_pool(words_per_list=words_per_list)
+        session = listgen.fr.generate_session_pool(num_lists = 26)
         stimspec = {
             (0,): 4,
             (1,): 5,
@@ -133,7 +132,7 @@ class TestFR:
         with pytest.raises(AssertionError):
             listgen.assign_multistim(session, stimspec)
 
-        session = listgen.assign_list_types(session, 3, 7, 11, 4)
+        session = listgen.assign_list_types(session, 4, 7, 11, 4)
         multistim = listgen.assign_multistim(session, stimspec)
 
         assert 'stim_channels' in multistim.columns
@@ -143,7 +142,7 @@ class TestFR:
 
     def test_generate_rec1_blocks(self):
         pool = listgen.fr.generate_session_pool()
-        assigned = listgen.assign_list_types(pool, 3, 6, 16, 0)
+        assigned = listgen.assign_list_types(pool, 4, 6, 16, 0)
         lures = wordpool.load("REC1_lures_en.txt")
         blocks = listgen.generate_rec1_blocks(assigned, lures)
 
@@ -162,7 +161,7 @@ class TestFR:
     @pytest.mark.parametrize('iteration', range(5))
     def test_generate_learn1_blocks(self, iteration):
         session = listgen.fr.generate_session_pool()
-        pool = listgen.assign_list_types(session, 3, 6, 16)
+        pool = listgen.assign_list_types(session, 4, 6, 16)
         stimspec = {
             (0,): 5,
             (1,): 5,
@@ -202,29 +201,6 @@ class TestCatFR:
     def catpool(self):
         return wordpool.load("ram_categorized_en.txt")
 
-    def test_assign_word_numbers(self):
-        # categories are balanced
-        with pytest.raises(AssertionError):
-            df = pd.DataFrame({
-                "word": ["a", "b", "c"],
-                "category": ["cat1", "cat1", "cat2"]
-            })
-            listgen.catfr.assign_word_numbers(df)
-
-        pool = listgen.catfr.assign_word_numbers(self.catpool)
-        assert len(pool.word.unique()) == 300
-        assert "category" in pool.columns
-        assert "category_num" in pool.columns
-        assert "word" in pool.columns
-        assert "wordno" in pool.columns
-
-        # check word, category numbers assigned correctly
-        for cat in pool.category:
-            for n, row in pool[pool.category == cat].reset_index().iterrows():
-                assert n == row.wordno
-        assert [(pool.category_num[pool.category == cat] == n).all()
-                for n, cat in enumerate(sorted(pool.category.unique()))]
-
     def test_assign_list_numbers(self):
         # must assign word numbers first
         with pytest.raises(AssertionError):
@@ -233,10 +209,10 @@ class TestCatFR:
         pool = listgen.catfr.assign_word_numbers(self.catpool)
         assigned = listgen.catfr.assign_list_numbers(pool)
 
-        assert len(assigned) == 300
-        assert len(assigned.word.unique()) == 300
+        assert len(assigned) == 312
+        assert len(assigned.word.unique()) == 312
         assert "listno" in assigned.columns
-        assert len(assigned[assigned.listno < 0]) == 0
+        assert len(assigned[assigned.listno < 0]) == 0, str(assigned)
         counts = assigned.groupby("listno").listno.count()
         for count in counts:
             assert counts[count] == 12
@@ -252,8 +228,8 @@ class TestCatFR:
             listgen.catfr.assign_word_numbers(pool)))
 
         # check uniqueness and that all words/categories are used
-        assert len(pool.word.unique()) == 300
-        assert len(pool.category.unique()) == 25
+        assert len(pool.word.unique()) == 312
+        assert len(pool.category.unique()) == 26
 
         # check that words come in pairs
         for n in pool.index[::2]:
