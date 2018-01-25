@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from .. import exc
-from .. import load, shuffle_within_groups, shuffle_words
+from .. import load, shuffle_within_groups
 
 
 def assign_word_numbers(pool):
@@ -18,7 +18,8 @@ def assign_word_numbers(pool):
     word_count = pool.groupby("category").count().word
     n_words = word_count[0]
     for i in range(1, len(word_count)):
-        assert n_words == word_count[i], "The category " + str(i) + " appears not to have " + str (n_words) + " words. It has " + str(word_count[i]) + "."
+        error_message = "The category " + str(i) + " appears not to have " + str(n_words) + " words. It has " + str(word_count[i]) + "."
+        assert n_words == word_count[i], error_message
 
     # Assign word and category numbers
     pool["category_num"] = -999
@@ -72,11 +73,7 @@ def sort_pairs(pool):
     assert "wordno" in pool.columns
 
     def cond(category, listno, excluded):
-        return (
-            (pool.listno == listno) &
-            (pool.category == category) &
-            ~(pool.word.isin(excluded))
-        )
+        return (pool.listno == listno) & (pool.category == category) & ~(pool.word.isin(excluded))
 
     lists = []
     used = []

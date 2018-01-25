@@ -8,7 +8,9 @@ def assign_list_numbers_from_word_list(all_words, number_of_lists, start=0):
     """
     if len(all_words) == 0 or number_of_lists == 0:
         return []
-    assert len(all_words) % number_of_lists == 0, "The number of words must be evenly divisible by the number of lists. " + str(len(all_words)) + " isn't divisble by " + str(number_of_lists)
+    explanation = "The number of words must be evenly divisible by the number of lists. "
+    error_string = explanation + str(len(all_words)) + " isn't divisble by " + str(number_of_lists)
+    assert len(all_words) % number_of_lists == 0, error_string
 
     length_of_each_list = len(all_words)//number_of_lists
     for i in range(len(all_words)):
@@ -38,7 +40,8 @@ def assign_list_types_from_type_list(pool, num_baseline, stim_nonstim, num_ps=0)
     # Check that the inputs match the number of lists
     last_listno = pool[-1]['listno']
     parameters_list_count = num_baseline + len(stim_nonstim) + num_ps
-    assert last_listno+1 == parameters_list_count, "I think there should be " + str(parameters_list_count) + " lists but I see " + str(last_listno+1) + "." 
+    error_message = "I think there should be " + str(parameters_list_count) + " lists but I see " + str(last_listno+1) + "."
+    assert last_listno+1 == parameters_list_count, error_message
 
     for i in range(len(pool)):
         word = pool[i]
@@ -64,6 +67,7 @@ def assign_multistim_from_stim_channels_list(pool, stimspec_list):
     """
     return _assign_stim_attribute_from_stim_attribute_list(pool, stimspec_list, 'stim_channels')
 
+
 def assign_amplitudes_from_amplitude_index_list(pool, amplitude_index_list):
     """Update stim lists to account for varying stimulation amplitudes.
     :param list pool: Word pool with assigned stim lists. list items are dictionaries with these keys: word, listno, stim_channels, type)
@@ -71,7 +75,8 @@ def assign_amplitudes_from_amplitude_index_list(pool, amplitude_index_list):
     :rtype: list
     """
     return _assign_stim_attribute_from_stim_attribute_list(pool, amplitude_index_list, 'amplitude_index')
-    
+
+
 def _assign_stim_attribute_from_stim_attribute_list(pool, attribute_list, attribute_name):
     """Update stim lists to account for a new attribute.
 
@@ -101,6 +106,7 @@ def _assign_stim_attribute_from_stim_attribute_list(pool, attribute_list, attrib
             pool[i][attribute_name] = attribute_list[current_attribute_index]
 
     return pool
+
 
 def extract_blocks(pool, listnos, num_blocks):
     """Take out lists based on listnos and separate them into blocks

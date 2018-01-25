@@ -1,6 +1,5 @@
 """FR list generation."""
 
-import pandas as pd
 from .. import load, shuffle_words, pool_dataframe_to_pool_list, pool_list_to_pool_dataframe
 from ..nopandas import assign_list_numbers_from_word_list
 
@@ -9,6 +8,7 @@ RAM_LIST_SP = load("ram_wordpool_sp.txt")
 
 CAT_LIST_EN = load("ram_categorized_en.txt")
 CAT_LIST_SP = load("ram_categorized_sp.txt")
+
 
 def generate_session_pool(num_lists=26, language="EN"):
     """Generate the pool of words for a single task session. This does *not*

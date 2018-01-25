@@ -119,7 +119,7 @@ class TestFR:
 
     def test_assign_multistim(self):
         words_per_list = 12
-        session = listgen.fr.generate_session_pool(num_lists = 26)
+        session = listgen.fr.generate_session_pool(num_lists=26)
         stimspec = {
             (0,): 4,
             (1,): 5,
@@ -298,7 +298,7 @@ class TestPAL:
 
     def test_assign_cue_position(self):
         pool = listgen.pal.generate_n_session_pairs(1)[0]
-        cue_positions_by_list = [listgen.pal.assign_cues(words) for _,words in pool.groupby('listno')]
+        cue_positions_by_list = [listgen.pal.assign_cues(words) for _, words in pool.groupby('listno')]
         for list_cue_positions in cue_positions_by_list:
             assert sum([x == 'word1' for x in list_cue_positions]) == len(list_cue_positions)/2
             assert sum([x == 'word2' for x in list_cue_positions]) == len(list_cue_positions)/2
