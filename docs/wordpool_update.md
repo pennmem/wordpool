@@ -33,6 +33,7 @@ respondents in the norming study producing the category. Proper nouns (car
 companies, male/female names) were also excluded. This left the category: a type
 of fabric:
 
+```
   Fabric   COTTON
   -------- ---------
   Fabric   SILK
@@ -46,9 +47,11 @@ of fabric:
   Fabric   FLEECE
   Fabric   VELVET
   Fabric   SUEDE
+```
 
 ## Appendix: Words selected for replacement in FR wordpool
 
+```
   QUEEN    0.68590705
   -------- ------------
   WIFE     0.67710842
@@ -136,3 +139,4 @@ of fabric:
   STAMP    0.40268502
   BRAKE    0.37579803
   SWITCH   0.37147335
+  ```
