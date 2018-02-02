@@ -98,7 +98,7 @@ class TestFR:
         assert 'stim_channels' in session
         assert all(session[session.stim_channels.notnull()].stim_channels == (0,))
 
-        grouped = session.groupby("type")
+        grouped = session.groupby("phase_type")
         counts = grouped.count()
         assert len(counts.index) == 4
         assert counts.loc["BASELINE"].listno / words_per_list == 4
@@ -106,16 +106,16 @@ class TestFR:
         assert counts.loc["STIM"].listno / words_per_list == 11
         assert counts.loc["PS"].listno / words_per_list == 4
 
-        assert all(session[session["type"] == "PRACTICE"].listno == 0)
+        assert all(session[session["phase_type"] == "PRACTICE"].listno == 0)
 
         for n in range(1, 4):
-            assert n in session[session["type"] == "BASELINE"].listno.unique()
+            assert n in session[session["phase_type"] == "BASELINE"].listno.unique()
 
         for n in range(4, 8):
-            assert n in session[session["type"] == "PS"].listno.unique()
+            assert n in session[session["phase_type"] == "PS"].listno.unique()
 
         for n in range(8, 26):
-            assert session[session.listno == n]["type"].isin(["STIM", "NON-STIM"]).all()
+            assert session[session.listno == n]["phase_type"].isin(["STIM", "NON-STIM"]).all()
 
     def test_assign_multistim(self):
         words_per_list = 12

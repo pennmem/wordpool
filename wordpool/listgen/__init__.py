@@ -122,9 +122,9 @@ def assign_multistim(pool, stimspec):
         :rtype: pd.DataFrame
 
         """
-    assert 'type' in pool.columns, "You must assign stim lists first"
-    assert 'STIM' in pool['type'].unique(), "You must assign stim lists first"
-    stim_lists = list(pool[pool['type'] == 'STIM'].listno.unique())
+    assert 'phase_type' in pool.columns, "You must assign stim lists first"
+    assert 'STIM' in pool['phase_type'].unique(), "You must assign stim lists first"
+    stim_lists = list(pool[pool['phase_type'] == 'STIM'].listno.unique())
     assert sum(stimspec.values()) == len(stim_lists), \
         "Incompatible number of stim lists"
 
@@ -152,10 +152,10 @@ def generate_rec1_blocks(pool, lures):
     allowed = pool[~pool.isin(["PRACTICE", "BASELINE"])]
 
     # Divide into stim lists (exclude if in last four)...
-    stims = allowed[(allowed.type == "STIM") & (allowed.listno <= allowed.listno.max() - 4)]
+    stims = allowed[(allowed.phase_type == "STIM") & (allowed.listno <= allowed.listno.max() - 4)]
 
     # ...and nonstim lists (take all)
-    nonstims = allowed[allowed.type == "NON-STIM"]
+    nonstims = allowed[allowed.phase_type == "NON-STIM"]
 
     # Randomly select stim list numbers
     stim_idx = pd.Series(stims.listno.unique()).sample(6)
@@ -194,7 +194,7 @@ def generate_learn1_blocks(pool, num_nonstim, num_stim, stim_channels=(0, 1), nu
         :returns: 4 blocks of lists as a :class:`pd.DataFrame`.
 
         """
-    nonstim_listnos = random.sample(list(pool[pool.type == 'NON-STIM'].listno.unique()), num_nonstim)
+    nonstim_listnos = random.sample(list(pool[pool.phase_type == 'NON-STIM'].listno.unique()), num_nonstim)
     stim_listnos = random.sample(list(pool[pool.stim_channels == stim_channels].listno.unique()), num_stim)
     listnos = nonstim_listnos + stim_listnos
 
